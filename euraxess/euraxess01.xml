@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "PrimarySQL">
+                <fragment id="1" target="select" enable="always">job_id,job_title,job_summary,job_description,main_research_field,sub_research_field,researcher_profile,type_of_contract,job_status,hours_per_week,job_start_date,application_deadline,science4refugees,comment,info_website,framework_programme,job_reference_number,nr_job_positions,job_organisation_institute,job_country,job_city,organisation_institute,organisation_institute_type,country,e_mail,website,benefits,research_sub_field,years_of_research_experience,degree,discipline,language,language_level,updatetime,published</fragment>
+                <fragment id="2" target="from" enable="always">aux</fragment>
+                <fragment id="3" target="where" conditionals="cond_datefrom" enable="all">published>=@{[cr_datefrom]}</fragment>
+                <fragment id="4" target="where" conditionals="cond_dateto" enable="all">published<=@{[cr_dateto]}</fragment>
+            </statement>
+        </sql>
+        <args>
+		    <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+        </args>
+        <conditionals>
+            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+        </conditionals>
+    </sqltemplate>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="csv" >
+            <location></location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="data" name="data" alias="data" tAlias ="tdata" format="csv" conditionals="">
+                    <content>SELECT * FROM tAux</content>
+                    <location>20220215_euraxess.csv</location>
+                    <defaultlocation></defaultlocation>
+                    <options>
+                        <option name="multiLine" value="true" type="bool" />
+                        <option name="mode" value="PERMISSIVE" type="text" />
+                        <option name="wholeFile" value="true" type="text" />
+                        <option name="delimiter" value=";" type="text" />
+                        <option name="header" value="true" type="text" />
+                        <option name="enforceSchema" value="false" type="text" />
+                        <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
+                        <option name="mode" value="DROPMALFORMED" type="text" />
+                    </options>
+                </entity>
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out" name="MyOut" datatype="euraxess.Out.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" conditionals="" sql="PrimarySQL">
+            <location></location>
+            <defaultlocation></defaultlocation>
+            <parameters>
+		<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+            <options>
+            </options>
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>

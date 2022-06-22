@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement>
+                <fragment id="1" target="select" enable="always">Field1,Field2</fragment>
+                <fragment id="2" target="from" enable="always">Table1</fragment>
+                <fragment id="3" target="from" enable="always">INNER JOIN Table2 ON  Table1.ID = Table2.ID</fragment>
+                <fragment id="4" target="from" enable="always">Table3</fragment>
+                <fragment id="5" target="where" cond="cond1" enable="all">Table1.code = '@{[param1]}'</fragment>
+                <fragment id="6" target="where" cond="cond1" enable="always">Table1.type = 'low' </fragment>
+                <fragment target="orderby" enable="always">Table1.name</fragment>
+                <fragment target="orderby" cond="cond2" enable="all">Table1.dateofcreation</fragment>
+            </statement>
+            <statement id="secondarySql">
+                <fragment target="select" cond="comma separated conditions to evaluate" condEval="never">MyField</fragment>
+            </statement>
+        </sql>
+        <arguments>
+            <arg id="param1" type="text" overridable="true" />
+            <arg id="param2" type="text" value="123" defaultValue="212" overridable="false" />
+            <!--
+            <arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
+            <arg id="dt" type="date" defaultValue="null" />
+            <arg id="df" type="date" defaultValue="null" />
+            -->
+        </arguments>
+        <conditionals>
+            <!-- Simple conditionals only supported: comparison of arg value against a list of text value -->
+            <conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
+            <conditional id="cond2" test="eq" value ="123" options="" type="text">@{[param2]}</conditional>
+        </conditionals>
+    </sqltemplate>
+    <datasources>
+        <!-- IntelComp extensions note:
+            Datasets must be labeled also at the base interface of the mediator, -ds oagd:{dsid} and multiple -ds ids may be supplied.
+            If location cannot be inferred from the Catalogue then the location pointed out in the datasource shall be used (if supplied).
+            In IntelComp this may be used to consume non-catalogue datasets.
+            -->
+        <!--
+            a datasource carries information about location, protocol, credentials and options
+            for consuming a number of entities
+            id: used for referencing source.
+            name: a label for the source
+            datatype: an optional type for the store to be optionally validated by the
+            storetype: mandatory field that declares what type of store is used for the dataset (store processor class name)
+            format: an optional format argument for the store. it is utilized depending on the storetype. May be overridden by entity format.
+            -->
+        <datasource id="oagd" name="MyDataset" datatype="OpenAIREGraphDump" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="json" >
+            <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
+            <!--
+                location respresents the root "endpoint" where the data will be located.
+                location is interpreted depending on the storetype.
+                location is normally given via:
+                    (a) locating the datasource in some catalogue (external to templating)
+                    (b) parameter passed to the program
+                    (c) hardcoded in the element below
+                local files are prefixed by file:/// (URI)
+            -->
+            <location></location>
+            <!-- If location is null then default location is used as a fallback-->
+            <defaultlocation></defaultlocation>
+
+            <!-- Parameters are passed to the processor for arbitrary use -->
+            <parameters>
+
+            </parameters>
+            <!--options are passed to the connector for the datasource, if required and are generally passed through to Spark -->
+            <options>
+                <option name="anoption" value="optionvalue" type="text" />
+            </options>
+            <!--entities belong to a datasource and might be tables or other typed data-->
+            <entities>
+                <!--
+                    format: passed to spark. Examples:
+                                xmlfolder, xml|xmlfile, jsonfolder,json|jsonfile, parquetfolder, parquet|parquetfile, xlsx, csvfolder, csv|csvfile, dir|folder|directory, rdbmstable|odbctable
+                                in many cases format is passed through to sparksDdataFrameReader format(<format>) call
+                    conditionals: conditionals evaluated into true for including the entity
+                    tAlias: used for entity temp view naming, in absent then tmp_<alias> is used. A Temp view is used when content is declared below
+                -->
+                <entity id="results" name="Results" alias="R" tAlias ="tResults" format="parquet" conditionals="">
+                    <!-- TODO: check what can be inferred from the catalogue (e.g. location and type) -->
+                    <!--Any selector (e.g. query) specific to the source that may applied to the entity before it can be utilised by
+                    the query. The selector mus utilize the tAlias name, as the alias is created as a result of the selector. -->
+                    <content>SELECT * FROM tResults</content>
+                    <!--
+                        location must be interpreted relative to the
+                        location declared at the datasource that is enclosing the entity
+                    -->
+                    <location>results</location>
+                    <defaultlocation></defaultlocation>
+                    <!-- Parameters are passed to the connector for arbitrary use -->
+                    <parameters>
+
+                    </parameters>
+                    <!-- options for the entity, depending on the type of the datasource/entity -->
+                    <options>
+                        <option name="multiLine" value="true" type="bool" />
+                        <option name="mode" value="PERMISSIVE" type="text" />
+                        <option name="wholeFile" value="true" type="text" />
+                        <option name="delimiter" value="," type="text" />
+                        <option name="header" value="true" type="text" />
+                        <option name="enforceSchema" value="false" type="text" />
+                        <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
+                        <option name="mode" value="DROPMALFORMED" type="text" />
+                    </options>
+                </entity>
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <!--
+            id: internal identifier of the sink and the associated Dataset
+            sql: the id of the sql statement that will be executed on spark (sqltemplate element)
+            format: the output of spark passed to DataFrameReader format() (depending on the component)
+            storetype: the class to handle the store (sink processor)
+            datatype: passed to the sink for any additional manipulation
+            name: label, arbitrarily used by the Sink
+        -->
+        <datasink id="out" name="MyOut" datatype="MyDataSetType"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" enable="always"
+                  conditionals="" sql="secondarySql">
+            <!--Sink Parameters, consumed by the sink processor-->
+            <parameters>
+                <parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+            <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
+            <!-- location: the url/location of the sink. Should be provided by the caller -->
+            <location></location>
+            <defaultlocation></defaultlocation>
+            <!-- the entity (location) for this sink if this is required by the datasink-->
+            <entity></entity>
+            <!--Options provided to the sink. May be utilized in adhoc manner by the sink processor,
+            but are generally passed through to spark-->
+            <options>
+                <option name="multiLine" value="true" type="bool" />
+                <option name="mode" value="PERMISSIVE" type="text" />
+            </options>
+        </datasink>
+    </datasinks>
+</document>

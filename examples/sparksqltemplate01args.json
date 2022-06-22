@@ -1,0 +1,11 @@
+{
+    "queryArguments":
+    {
+      "param1": "123",
+      "param2": "125",
+      "param3": "235"
+    },
+  "programArguments":
+  {
+  }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<args>
+    <queryArguments>
+        <param1>124</param1>
+        <param2>135</param2>
+		<cr_minvalue>500</cr_minvalue>
+    </queryArguments>
+    <programArguments>
+        <explain>true</explain>
+    </programArguments>
+</args>
