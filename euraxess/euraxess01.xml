@@ -3,10 +3,10 @@
     <sqltemplate>
         <sql>
             <statement id = "PrimarySQL">
-                <fragment id="1" target="select" enable="always">job_id,job_title,job_summary,job_description,main_research_field,sub_research_field,researcher_profile,type_of_contract,job_status,hours_per_week,job_start_date,application_deadline,science4refugees,comment,info_website,framework_programme,job_reference_number,nr_job_positions,job_organisation_institute,job_country,job_city,organisation_institute,organisation_institute_type,country,e_mail,website,benefits,research_sub_field,years_of_research_experience,degree,discipline,language,language_level,updatetime,published</fragment>
-                <fragment id="2" target="from" enable="always">aux</fragment>
-                <fragment id="3" target="where" conditionals="cond_datefrom" enable="all">published>=@{[cr_datefrom]}</fragment>
-                <fragment id="4" target="where" conditionals="cond_dateto" enable="all">published<=@{[cr_dateto]}</fragment>
+                <fragment id="1" target="select" enable="always">job_id, job_title,job_summary,job_description,main_research_field,sub_research_field,researcher_profile,type_of_contract,job_status,hours_per_week,job_start_date,application_deadline,science4refugees,comment,info_website,framework_programme,job_reference_number,nr_job_positions,job_organisation_institute,job_country,job_city,organisation_institute,organisation_institute_type,country,e_mail,website,benefits,research_sub_field,years_of_research_experience,degree,discipline,language,language_level,updatetime,published</fragment>
+                <fragment id="2" target="from" enable="always">data</fragment>
+                <fragment id="3" target="where" conditionals="cond_datefrom" enable="all">cast(published as date) &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
+                <fragment id="4" target="where" conditionals="cond_dateto" enable="all">cast(published as date) &lt;= cast('@{[cr_dateto]}' as date)</fragment>
             </statement>
         </sql>
         <args>
@@ -22,20 +22,20 @@
     </extenders>
     <datasources>
         <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="csv" >
-            <location></location>
+            <location>hdfs://ic-devhdfs.vhosts.cite.gr:8020/user/Euraxess</location>
             <defaultlocation></defaultlocation>
             <options>
             </options>
             <entities>
                 <entity id="data" name="data" alias="data" tAlias ="tdata" format="csv" conditionals="">
-                    <content>SELECT * FROM tAux</content>
+                    <content>SELECT * FROM tdata</content>
                     <location>20220215_euraxess.csv</location>
                     <defaultlocation></defaultlocation>
                     <options>
                         <option name="multiLine" value="true" type="bool" />
                         <option name="mode" value="PERMISSIVE" type="text" />
                         <option name="wholeFile" value="true" type="text" />
-                        <option name="delimiter" value=";" type="text" />
+                        <option name="delimiter" value="," type="text" />
                         <option name="header" value="true" type="text" />
                         <option name="enforceSchema" value="false" type="text" />
                         <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
@@ -49,7 +49,7 @@
         <datasink id="out" name="MyOut" datatype="euraxess.Out.01"
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
                   format="json" conditionals="" sql="PrimarySQL">
-            <location></location>
+            <location>hdfs://ic-devhdfs.vhosts.cite.gr:8020/data/out_euraxess</location>
             <defaultlocation></defaultlocation>
             <parameters>
 		<parameter name="singleFile" value="true" type="bool" />

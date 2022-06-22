@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <args>
     <queryArguments>
+		<cr_datefrom>2022-01-01</cr_datefrom>
+		<cr_dateto>2022-02-15</cr_dateto>
     </queryArguments>
     <programArguments>
         <explain>true</explain>
