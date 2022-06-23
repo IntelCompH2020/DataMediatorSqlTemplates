@@ -12,6 +12,9 @@
         <args>
 		    <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
 		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
         </args>
         <conditionals>
             <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
@@ -22,7 +25,7 @@
     </extenders>
     <datasources>
         <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="csv" >
-            <location>hdfs://ic-devhdfs.vhosts.cite.gr:8020/user/Euraxess</location>
+            <location>@{[fs]}@{[src]}</location>
             <defaultlocation></defaultlocation>
             <options>
             </options>
@@ -49,10 +52,10 @@
         <datasink id="out" name="MyOut" datatype="euraxess.Out.01"
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
                   format="json" conditionals="" sql="PrimarySQL">
-            <location>hdfs://ic-devhdfs.vhosts.cite.gr:8020/data/out_euraxess</location>
+            <location>@{[fs]}@{[dest]}</location>
             <defaultlocation></defaultlocation>
             <parameters>
-		<parameter name="singleFile" value="true" type="bool" />
+				<parameter name="singleFile" value="true" type="bool" />
             </parameters>
             <options>
             </options>
