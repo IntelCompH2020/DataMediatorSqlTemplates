@@ -15,13 +15,13 @@
                 <fragment id="from_resultproject" target="from" enable="always">LEFT JOIN rp ON r.id = rp.id</fragment>
                 <fragment id="from_project" target="from" enable="always">LEFT JOIN prj ON rp.project = prj.id</fragment>
                 <fragment id="where_publications" target="where" enable="always">r.type = 'publication'</fragment>
-                <fragment id="where_qa_df" target="where" conditionals="xxxx" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
-                <fragment id="where_qa_dt" target="where" conditionals="xxxx" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
-                <fragment id="where_qa_pub" target="where" conditionals="xxxx" enable="all">r.publisher IN (@{[cr_publisherlist]})</fragment>
-                <fragment id="where_qa_jrn" target="where" conditionals="xxxx" enable="all">r.journal IN (@{[cr_journallist]})</fragment>
-                <fragment id="where_qa_prja" target="where" conditionals="xxxx" enable="all">p.acronym IN (@{[cr_projectlist]})</fragment>
-                <fragment id="where_qa_prjc" target="where" conditionals="xxxx" enable="all">p.code IN (@{[cr_projectlist]})</fragment>
-                <fragment id="where_qa_fnd" target="where" conditionals="xxxx" enable="all">pf.funder IN (@{[cr_funderlist]})</fragment>
+                <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
+                <fragment id="where_qa_pub" target="where" conditionals="cond_publishers" enable="all">r.publisher IN (@{[cr_publisherlist]})</fragment>
+                <fragment id="where_qa_jrn" target="where" conditionals="cond_journals" enable="all">r.journal IN (@{[cr_journallist]})</fragment>
+                <fragment id="where_qa_prja" target="where" conditionals="cond_projects" enable="all">p.acronym IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_prjc" target="where" conditionals="cond_projects" enable="all">p.code IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_fnd" target="where" conditionals="cond_funders" enable="all">pf.funder IN (@{[cr_funderlist]})</fragment>
 
                 <fragment id="groupby" target="groupBy" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
             </statement>

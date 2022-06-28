@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <args>
-    <queryArguments>
+    <templateArguments>
 		<cr_datefrom>2022-01-01</cr_datefrom>
 		<cr_dateto>2022-02-15</cr_dateto>
 		<fs>hdfs://ic-devhdfs.vhosts.cite.gr:8020</fs>
 		<src>/user/Euraxess</src>
 		<dest>/data/out/euraxess</dest>
-    </queryArguments>
+    </templateArguments>
     <programArguments>
         <explain>true</explain>
     </programArguments>
