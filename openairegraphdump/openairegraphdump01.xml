@@ -19,11 +19,10 @@
                 <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
                 <fragment id="where_qa_pub" target="where" conditionals="cond_publishers" enable="all">r.publisher IN (@{[cr_publisherlist]})</fragment>
                 <fragment id="where_qa_jrn" target="where" conditionals="cond_journals" enable="all">r.journal IN (@{[cr_journallist]})</fragment>
-                <fragment id="where_qa_prja" target="where" conditionals="cond_projects" enable="all">p.acronym IN (@{[cr_projectlist]})</fragment>
-                <fragment id="where_qa_prjc" target="where" conditionals="cond_projects" enable="all">p.code IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_prja" target="where" conditionals="cond_projects" enable="all">prj.acronym IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_prjc" target="where" conditionals="cond_projects" enable="all">prj.code IN (@{[cr_projectlist]})</fragment>
                 <fragment id="where_qa_fnd" target="where" conditionals="cond_funders" enable="all">pf.funder IN (@{[cr_funderlist]})</fragment>
-
-                <fragment id="groupby" target="groupBy" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
+                <fragment id="groupby" target="groupby" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
             </statement>
         </sql>
         <args>
@@ -76,7 +75,7 @@
                 <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_RA" format="parquet" conditionals="">
                     <location>result_author</location>
                 </entity>
-                <entity id="project" name="project" alias="p" tAlias ="tmp_P" format="parquet" conditionals="">
+                <entity id="project" name="project" alias="prj" tAlias ="tmp_PRJ" format="parquet" conditionals="">
                     <location>project</location>
                 </entity>
                 <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_RP" format="parquet" conditionals="">
