@@ -7,7 +7,7 @@
       <cr_journallist></cr_journallist>
       <cr_projectlist></cr_projectlist>
       <cr_funderlist></cr_funderlist>
-      <fs>hdfs://ic-devhdfs.vhosts.cite.gr:8020</fs>
+      <fs>hdfs://ic-devel01.local.cite.gr:8020</fs>
       <src>/user/hive/warehouse/intelcomp.db.2</src>
       <dest>/data/out/openaire-small</dest>
     </templateArguments>
