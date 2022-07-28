@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "PrimarySQL">
+				<!--
+                <fragment id="sel_base" target="select" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
+                <fragment id="collect_titles" target="select" enable="always">collect_list(rt.title) as titles</fragment>
+                <fragment id="collect_authors" target="select" enable="always">collect_list(ra.fullname) as authors</fragment>
+                <fragment id="collect_descriptions" target="select" enable="always">collect_list(rd.description) as descriptions</fragment>
+                <fragment id="collect_projects" target="select" enable="always">collect_list(prj.title) as projects</fragment>
+				-->
+				<fragment id="sel_result" target="select" enable="always">r.id</fragment>
+				<fragment id="collect_resultpids" target="select" enable="always">collect_list(struct(ripid.type, ripid.pid)) as g_pids</fragment>
+				<fragment id="collect_resultprojects" target="select" enable="always">collect_list(struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency)) as g_prjs</fragment>
+				<fragment id="collect_resultorgs" target="select" enable="always">collect_list(struct(org.name, org.legalshortname, org.country)) as g_orgs</fragment>
+				
+
+                <fragment id="from_result" target="from" enable="always">r</fragment>
+				<!--
+                <fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rt ON r.id = rt.id</fragment>
+                <fragment id="from_resultauthor" target="from" enable="always">LEFT JOIN ra ON r.id = ra.id</fragment>
+                <fragment id="from_resultdescription" target="from" enable="always">LEFT JOIN rd ON r.id = rd.id</fragment>
+				-->
+                <fragment id="from_resultproject" target="from" enable="always">LEFT JOIN rp ON r.id = rp.id</fragment>
+                <fragment id="from_project" target="from" enable="always">LEFT JOIN prj ON rp.project = prj.id</fragment>
+                <fragment id="from_projectorganizations" target="from" enable="always">LEFT JOIN po ON rp.project = po.id</fragment>
+				<fragment id="from_organization" target="from" enable="always">LEFT JOIN org ON po.organization = org.id</fragment>
+                <fragment id="from_resultinstance" target="from" enable="always">LEFT JOIN ri ON r.id = ri.result</fragment>
+				<fragment id="from_resultinstancepid" target="from" enable="always">LEFT JOIN ripid ON r.id = ripid.result</fragment>
+				
+                <fragment id="where_publications" target="where" enable="always">r.type = 'publication'</fragment>
+				
+				
+                <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
+				<!--
+                <fragment id="where_qa_pub" target="where" conditionals="cond_publishers" enable="all">r.publisher IN (@{[cr_publisherlist]})</fragment>
+                <fragment id="where_qa_jrn" target="where" conditionals="cond_journals" enable="all">r.journal IN (@{[cr_journallist]})</fragment>
+                <fragment id="where_qa_prja" target="where" conditionals="cond_projects" enable="all">prj.acronym IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_prjc" target="where" conditionals="cond_projects" enable="all">prj.code IN (@{[cr_projectlist]})</fragment>
+                <fragment id="where_qa_fnd" target="where" conditionals="cond_funders" enable="all">pf.funder IN (@{[cr_funderlist]})</fragment>
+				-->
+				
+				<!--
+                <fragment id="gb_result" target="groupby" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
+				-->
+                <fragment id="gb_result" target="groupby" enable="always">r.id</fragment>
+            </statement>
+        </sql>
+        <args>
+		    <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+			<!--
+            <arg id="cr_publisherlist" type="text" overridable="true" />
+            <arg id="cr_journallist" type="text" overridable="true" />
+            <arg id="cr_projectlist" type="text" overridable="true" />
+            <arg id="cr_funderlist" type="text" overridable="true" />
+			-->
+
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
+        </args>
+        <conditionals>
+            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+			<!--
+            <conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
+            <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
+            <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
+            <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>
+			-->
+        </conditionals>
+    </sqltemplate>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="parquet" >
+            <location>@{[fs]}@{[src]}</location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="result" name="result" alias="r" tAlias ="tmp_R" format="parquet" conditionals="">
+                    <content></content>
+                    <location>result</location>
+                    <defaultlocation></defaultlocation>
+                    <!--
+                    <options>
+                        <option name="multiLine" value="true" type="bool" />
+                        <option name="mode" value="PERMISSIVE" type="text" />
+                        <option name="wholeFile" value="true" type="text" />
+                        <option name="delimiter" value="," type="text" />
+                        <option name="header" value="true" type="text" />
+                        <option name="enforceSchema" value="false" type="text" />
+                        <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
+                        <option name="mode" value="DROPMALFORMED" type="text" />
+                    </options>
+                    -->
+                </entity>
+                <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_RA" format="parquet" conditionals="">
+                    <location>result_author</location>
+                </entity>
+                <entity id="project" name="project" alias="prj" tAlias ="tmp_PRJ" format="parquet" conditionals="">
+                    <location>project</location>
+                </entity>
+                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_RP" format="parquet" conditionals="">
+                    <location>result_project</location>
+                </entity>
+                <entity id="project_organizations" name="project_organizations" alias="po" tAlias ="tmp_PO" format="parquet" conditionals="">
+                    <location>project_organizations</location>
+                </entity>
+                <entity id="organization" name="organization" alias="org" tAlias ="tmp_ORG" format="parquet" conditionals="">
+                    <location>organization</location>
+                </entity>
+                <entity id="result_instance" name="result_instance" alias="ri" tAlias ="tmp_RI" format="parquet" conditionals="">
+                    <location>result_instance</location>
+                </entity>
+                <entity id="result_instance_pid" name="result_instance_pid" alias="ripid" tAlias ="tmp_RIPID" format="parquet" conditionals="">
+                    <location>result_instance_pid</location>
+                </entity>
+                <entity id="result_titles" name="result_titles" alias="rt" tAlias ="tmp_RT" format="parquet" conditionals="">
+                    <location>result_titles</location>
+                </entity>
+                <entity id="result_description" name="result_description" alias="rd" tAlias ="tmp_RD" format="parquet" conditionals="">
+                    <location>result_description</location>
+                </entity>
+                <entity id="project_funding" name="project_funding" alias="pf" tAlias ="tmp_PF" format="parquet" conditionals="">
+                    <location>project_funding</location>
+                </entity>
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out" name="MyOut" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" conditionals="" sql="PrimarySQL">
+            <location>@{[fs]}@{[dest]}</location>
+            <defaultlocation></defaultlocation>
+            <parameters>
+				<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+            <options>
+            </options>
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>
