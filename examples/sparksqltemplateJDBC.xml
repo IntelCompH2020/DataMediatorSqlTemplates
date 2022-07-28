@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "PrimarySQL">
+                <fragment id="1" target="select" enable="always">*</fragment>
+                <fragment id="2" target="from" enable="always">Results</fragment>
+<!--                <fragment target="where" cond="cond_minvalue" enable="all">Value>=@{[cr_minvalue]}</fragment>-->
+<!--                <fragment target="orderby" cond="cond1" enable="all">Value</fragment>-->
+            </statement>
+        </sql>
+        <args>
+<!--		    <arg id="cr_minvalue" type="text" overridable="true" />-->
+<!--            <arg id="param1" type="text" overridable="true" />-->
+<!--            <arg id="param2" type="text" value="123" overridable="false" />-->
+            <!--
+
+            <arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
+            <arg id="dt" type="date" defaultValue="null" />
+            <arg id="df" type="date" defaultValue="null" />
+            -->
+        </args>
+        <conditionals>
+<!--            &lt;!&ndash; Simple conditionals only supported: comparison of arg value against a list of text value &ndash;&gt;-->
+<!--            <conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>-->
+<!--			<conditional id="cond_minvalue" test="exists" type="text">@{[cr_minvalue]}</conditional>-->
+        </conditionals>
+    </sqltemplate>
+    <extenders>
+
+    </extenders>
+    <datasources>
+        <!-- IntelComp extensions note:
+            Datasets must be labeled also at the base interface of the mediator, -ds oagd:{dsid} and multiple -ds ids may be supplied.
+            If location cannot be inferred from the Catalogue then the location pointed out in the datasource shall be used (if supplied).
+            In IntelComp this may be used to consume non-catalogue datasets.
+            -->
+        <!--
+            a datasource carries information about location, protocol, credentials and options 
+            for consumming a number of entities
+            -->
+        <datasource id="jdbc" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset"
+                    storetype="com.citesa.spark.sqlcomposer.store.JdbcSqlDbStore" format="jdbc" >
+            <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
+            <!-- location is normally given via 
+            (a) locating the datasource in some catalogue (external to templating) 
+            (b) parameter passed to the program
+            -->
+            <location>jdbc:postgresql://db:5432/dbname</location>
+            <!-- If location is null then default location is used as a fallback-->
+            <defaultlocation></defaultlocation>
+            <!--options are passed to the connector for the datasource, if required -->
+            <options>
+                <!--
+                    <option name="anoption" value="optionvalue" type="text" />
+                    -->
+            </options>
+            <!--entities belong to a datasource and might be tables or other typed data-->
+            <entities>
+            <!-- 
+                tAlias: used for entity temp view naming, in absent then tmp_<alias> is used
+
+                -->
+                <entity id="results" name="Results" alias="Results" tAlias ="tResults" format="jdbc" >
+                    <!-- TODO: check what can be inferred from the catalogue (e.g. location and type) -->
+                    <!-- TODO: check what can be inferred from the catalogue (e.g. location and type) -->
+                    <!--Any selector (e.g. query) that may applied to the entity before it can be utilised by
+                    the query -->
+                    <content>SELECT * FROM tResults</content>
+                    <!-- 
+                        location must be interpreted in relationship to the 
+                        location declared at the datasource that is enclosing the entity 
+                    -->
+                    <location>public.&quot;dbtable&quot;</location>
+                    <defaultlocation></defaultlocation>
+                    <options>
+					<option name="driver" value="org.postgresql.Driver" type="text" />
+                    <option name="user" value="username" type="text" />
+                    <option name="password" value="password" type="text" />
+
+                    </options>
+                </entity>
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <!--
+            id: internal identifier of the sink and the associated Dataset
+            sql: the id of the sql statement that will be executed on spark (sqltemplate element)
+            format: the output of spark passed to DataFrameReader format() (depending on the component)
+            storetype: the class to handle the store
+            datatype: passed to the sink for any additional manipulation
+            name: label, arbitrarily used by the Sink
+        -->
+        <datasink id="out" name="MyOut" datatype="MyDataSetType"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" sql="PrimarySQL">
+            <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
+            <location>file:data/out/test</location>
+            <defaultlocation></defaultlocation>
+            <!--Sink Parameters, consumed by the sink processor-->
+            <parameters>
+		<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+            <!--Options provided to the sink. May be utilized in adhoc manner by the sink processor,
+            but are generally passed through to spark-->
+            <options>
+                <!--
+                <option name="multiLine" value="true" type="bool" />
+                <option name="mode" value="PERMISSIVE" type="text" />
+                -->
+            </options>
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>
