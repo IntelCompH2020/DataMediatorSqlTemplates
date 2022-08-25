@@ -11,9 +11,9 @@
                 <fragment id="collect_projects" target="select" enable="always">collect_list(prj.title) as projects</fragment>
 				-->
 				<fragment id="sel_result" target="select" enable="always">r.id</fragment>
-				<fragment id="collect_resultpids" target="select" enable="always">collect_list(struct(ripid.type, ripid.pid)) as g_pids</fragment>
-				<fragment id="collect_resultprojects" target="select" enable="always">collect_list(struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency)) as g_prjs</fragment>
-				<fragment id="collect_resultorgs" target="select" enable="always">collect_list(struct(org.name, org.legalshortname, org.country)) as g_orgs</fragment>
+				<fragment id="collect_resultpids" target="select" enable="always">collect_list(DISTINCT struct(ripid.type, ripid.pid)) as g_pids</fragment>
+				<fragment id="collect_resultprojects" target="select" enable="always">collect_list(DISTINCT struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency)) as g_prjs</fragment>
+				<fragment id="collect_resultorgs" target="select" enable="always">collect_list(DISTINCT struct(org.name, org.legalshortname, org.country)) as g_orgs</fragment>
 				
 
                 <fragment id="from_result" target="from" enable="always">r</fragment>
