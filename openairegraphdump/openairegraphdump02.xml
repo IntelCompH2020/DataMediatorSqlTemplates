@@ -10,10 +10,11 @@
                 <fragment id="collect_descriptions" target="select" enable="always">collect_list(rd.description) as descriptions</fragment>
                 <fragment id="collect_projects" target="select" enable="always">collect_list(prj.title) as projects</fragment>
 				-->
-				<fragment id="sel_result" target="select" enable="always">r.id</fragment>
+				<fragment id="sel_result" target="select" enable="always">r.id, r.bestaccessrights, r.embargoenddate</fragment>
 				<fragment id="collect_resultpids" target="select" enable="always">collect_list(DISTINCT struct(ripid.type, ripid.pid)) as g_pids</fragment>
 				<fragment id="collect_resultprojects" target="select" enable="always">collect_list(DISTINCT struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency)) as g_prjs</fragment>
 				<fragment id="collect_resultorgs" target="select" enable="always">collect_list(DISTINCT struct(org.name, org.legalshortname, org.country)) as g_orgs</fragment>
+				<fragment id="collect_funders" target="select" enable="always">collect_list(DISTINCT struct(pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2)) as g_funders</fragment>
 				
 
                 <fragment id="from_result" target="from" enable="always">r</fragment>
@@ -28,10 +29,12 @@
 				<fragment id="from_organization" target="from" enable="always">LEFT JOIN org ON po.organization = org.id</fragment>
                 <fragment id="from_resultinstance" target="from" enable="always">LEFT JOIN ri ON r.id = ri.result</fragment>
 				<fragment id="from_resultinstancepid" target="from" enable="always">LEFT JOIN ripid ON r.id = ripid.result</fragment>
+				<fragment id="from_projectfunders" target="from" enable="always">LEFT JOIN pf ON rp.project = pf.id</fragment>
 				
                 <fragment id="where_publications" target="where" enable="always">r.type = 'publication'</fragment>
-				
-				
+                <fragment id="where_hasdoi" target="where" enable="always">ripid.type = 'Digital Object Identifier'</fragment>
+                
+				<fragment id="where_hasproject" target="where" conditionals="cond_onlyproject" enable="all" >isnotnull(prj.id)</fragment>
                 <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
                 <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
 				<!--
@@ -45,7 +48,7 @@
 				<!--
                 <fragment id="gb_result" target="groupby" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
 				-->
-                <fragment id="gb_result" target="groupby" enable="always">r.id</fragment>
+                <fragment id="gb_result" target="groupby" enable="always">r.id, r.bestaccessrights, r.embargoenddate</fragment>
             </statement>
         </sql>
         <args>
@@ -65,6 +68,7 @@
         <conditionals>
             <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
 			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+			<conditional id="cond_onlyproject" test="exists" type="text">@{[cr_hasproject]}</conditional>
 			<!--
             <conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
             <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
