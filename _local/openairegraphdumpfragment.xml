@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "project">
+				<fragment id="select" target="select" enable="always">*</fragment>
+				<fragment id="from" target="from" enable="always">p</fragment>
+				<fragment id="where" target="where" enable="always">p.id in (select id from po)</fragment>
+            </statement>
+            <statement id = "project_organization">
+				<fragment id="select" target="select" enable="always">*</fragment>
+				<fragment id="from" target="from" enable="always">po</fragment>
+				<fragment id="where" target="where" enable="always">po.id in (select id from p)</fragment>
+            </statement>
+            <statement id = "organization">
+				<fragment id="select" target="select" enable="always">*</fragment>
+				<fragment id="from" target="from" enable="always">o</fragment>
+				<fragment id="where" target="where" enable="always">o.id in (select organization from po)</fragment>
+            </statement>
+        </sql>
+        <args>
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
+        </args>
+        <conditionals>
+        </conditionals>
+    </sqltemplate>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.store.FileStore" format="parquet" >
+            <location>@{[fs]}@{[src]}</location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="project" name="project" alias="p" tAlias ="tmp_P" format="parquet" conditionals="">
+                    <location>project</location>
+                </entity>
+                <entity id="project_organizations" name="project_organizations" alias="po" tAlias ="tmp_PO" format="parquet" conditionals="">
+                    <location>project_organizations</location>
+                </entity>
+                <entity id="organization" name="organization" alias="o" tAlias ="tmp_O" format="parquet" conditionals="">
+                    <location>organization</location>
+                </entity>
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out1" name="project" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="parquet" conditionals="" sql="project">
+            <location>@{[fs]}@{[dest]}/project</location>
+            <parameters>
+				<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+        </datasink>
+        <datasink id="out2" name="project_organisations" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="parquet" conditionals="" sql="project_organization">
+            <location>@{[fs]}@{[dest]}/project_organization</location>
+            <parameters>
+				<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+        </datasink>
+        <datasink id="out3" name="organisation" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="parquet" conditionals="" sql="organization">
+            <location>@{[fs]}@{[dest]}/organization</location>
+            <parameters>
+				<parameter name="singleFile" value="true" type="bool" />
+            </parameters>
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>

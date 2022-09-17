@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<args>
+    <templateArguments>
+      <fs>file://</fs>
+      <src>/data/oagd</src>
+      <dest>/data/out/oagd</dest>
+    </templateArguments>
+    <programArguments>
+        <explain>true</explain>
+    </programArguments>
+</args>
