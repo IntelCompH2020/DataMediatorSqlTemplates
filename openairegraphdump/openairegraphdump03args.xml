@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<args>
+    <templateArguments>
+	<cr_datefrom>2011-08-17</cr_datefrom>
+ <cr_dateto>2011-08-19</cr_dateto>
+    </templateArguments>
+    <programArguments>
+        <explain>true</explain>
+    </programArguments>
+</args>

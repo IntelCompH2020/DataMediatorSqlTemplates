@@ -9,22 +9,22 @@
                 <fragment target="orderby" cond="cond1" enable="all">Value</fragment>
             </statement>
         </sql>
-        <args>
-		    <arg id="cr_minvalue" type="text" overridable="true" />
-            <arg id="param1" type="text" overridable="true" />
-            <arg id="param2" type="text" value="123" overridable="false" />
-            <!--
-            <arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
-            <arg id="dt" type="date" defaultValue="null" />
-            <arg id="df" type="date" defaultValue="null" />
-            -->
-        </args>
-        <conditionals>
-            <!-- Simple conditionals only supported: comparison of arg value against a list of text value -->
-            <conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
-			<conditional id="cond_minvalue" test="exists" type="text">@{[cr_minvalue]}</conditional>
-        </conditionals>
     </sqltemplate>
+	<args>
+		<arg id="cr_minvalue" type="text" overridable="true" />
+		<arg id="param1" type="text" overridable="true" />
+		<arg id="param2" type="text" value="123" overridable="false" />
+		<!--
+		<arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
+		<arg id="dt" type="date" defaultValue="null" />
+		<arg id="df" type="date" defaultValue="null" />
+		-->
+	</args>
+	<conditionals>
+		<!-- Simple conditionals only supported: comparison of arg value against a list of text value -->
+		<conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
+		<conditional id="cond_minvalue" test="exists" type="text">@{[cr_minvalue]}</conditional>
+	</conditionals>	
     <extenders>
         <extender id="std" type="udfExtender" target="com.citesa.spark.sqlcomposer.StandardUdfLibrary" args="" />
     </extenders>

@@ -16,21 +16,21 @@
                 <fragment target="select" cond="comma separated conditions to evaluate" condEval="never">MyField</fragment>
             </statement>
         </sql>
-        <arguments>
-            <arg id="param1" type="text" overridable="true" />
-            <arg id="param2" type="text" value="123" defaultValue="212" overridable="false" />
-            <!--
-            <arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
-            <arg id="dt" type="date" defaultValue="null" />
-            <arg id="df" type="date" defaultValue="null" />
-            -->
-        </arguments>
-        <conditionals>
-            <!-- Simple conditionals only supported: comparison of arg value against a list of text value -->
-            <conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
-            <conditional id="cond2" test="eq" value ="123" options="" type="text">@{[param2]}</conditional>
-        </conditionals>
     </sqltemplate>
+	<arguments>
+		<arg id="param1" type="text" overridable="true" />
+		<arg id="param2" type="text" value="123" defaultValue="212" overridable="false" />
+		<!--
+		<arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
+		<arg id="dt" type="date" defaultValue="null" />
+		<arg id="df" type="date" defaultValue="null" />
+		-->
+	</arguments>
+	<conditionals>
+		<!-- Simple conditionals only supported: comparison of arg value against a list of text value -->
+		<conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
+		<conditional id="cond2" test="eq" value ="123" options="" type="text">@{[param2]}</conditional>
+	</conditionals>	
     <datasources>
         <!-- IntelComp extensions note:
             Datasets must be labeled also at the base interface of the mediator, -ds oagd:{dsid} and multiple -ds ids may be supplied.
@@ -73,7 +73,8 @@
             <entities>
                 <!--
                     format: passed to spark. Examples:
-                                xmlfolder, xml|xmlfile, jsonfolder,json|jsonfile, parquetfolder, parquet|parquetfile, xlsx, csvfolder, csv|csvfile, dir|folder|directory, rdbmstable|odbctable
+                                xmlfolder, xml|xmlfile, jsonfolder,json|jsonfile, parquetfolder, parquet|parquetfile, xlsx, csvfolder, csv|csvfile, dir|folder|directory, rdbmstable|odbctable , view
+								in order to create entity from view use format type view and content element
                                 in many cases format is passed through to sparksDdataFrameReader format(<format>) call
                     conditionals: conditionals evaluated into true for including the entity
                     tAlias: used for entity temp view naming, in absent then tmp_<alias> is used. A Temp view is used when content is declared below

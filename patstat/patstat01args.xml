@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <args>
-    <templateArguments>
-		<cr_datefrom>2022-01-01</cr_datefrom>
-		<cr_dateto>2022-02-15</cr_dateto>
+    <queryArguments>
+		<cr_datefrom>1964-11-01</cr_datefrom>
+		<cr_dateto>1965-01-01</cr_dateto>
 		<fs>file://</fs>
 		<src>/data/patstat/2021_Autumn</src>
 		<dest>/data/out/patstat</dest>
-    </templateArguments>
+    </queryArguments>
     <programArguments>
         <explain>true</explain>
     </programArguments>

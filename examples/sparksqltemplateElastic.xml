@@ -9,22 +9,22 @@
                 <fragment target="orderby" cond="cond1" enable="all">Value</fragment>-->
             </statement>
         </sql>
-        <args>
-            <!-- <arg id="cr_minvalue" type="text" overridable="true" />
-        <arg id="param1" type="text" overridable="true" />
-        <arg id="param2" type="text" value="123" overridable="false" />
-
-        <arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
-        <arg id="dt" type="date" defaultValue="null" />
-        <arg id="df" type="date" defaultValue="null" />
-        -->
-        </args>
-        <conditionals>
-            <!-- Simple conditionals only supported: comparison of arg value against a list of text value 
-            <conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
-			<conditional id="cond_minvalue" test="exists" type="text">@{[cr_minvalue]}</conditional>-->
-        </conditionals>
     </sqltemplate>
+	<args>
+		<!-- <arg id="cr_minvalue" type="text" overridable="true" />
+		<arg id="param1" type="text" overridable="true" />
+		<arg id="param2" type="text" value="123" overridable="false" />
+
+		<arg id="prj" type="text-list" options="" defaultvalue="null" value="12" override="0" />
+		<arg id="dt" type="date" defaultValue="null" />
+		<arg id="df" type="date" defaultValue="null" />
+		-->
+	</args>
+	<conditionals>
+		<!-- Simple conditionals only supported: comparison of arg value against a list of text value 
+		<conditional id="cond1" test="exists" type="text">@{[param1]}</conditional>
+		<conditional id="cond_minvalue" test="exists" type="text">@{[cr_minvalue]}</conditional>-->
+	</conditionals>
     <extenders>
         <!--<extender id="std" type="udfExtender" target="com.citesa.spark.sqlcomposer.StandardUdfLibrary" args="" />-->
     </extenders>
@@ -68,19 +68,50 @@
 
                     <options>
 
-<!--                        <option name="es.net.http.auth.user" value="username" type="text" />-->
-<!--                        <option name="es.net.http.auth.pass" value="password" type="text" />-->
+<!--                        <option name="es.net.http.auth.user" value="ic_sti_development" type="text" />-->
+<!--                        <option name="es.net.http.auth.pass" value="50K9zDkWuww6gA0SmiAG" type="text" />-->
 <!--                        <option name="es.net.ssl" value="true" type="boolean" />-->
 <!--                        <option name="es.net.ssl.cert.allow.self.signed" value="true" type="boolean" />-->
+
 <!--                        <option name="es.internal.es.version" value="7.17.5" type="text" />-->
 <!--                        <option name="es.internal.es.cluster.name" value="cite-common-cluster" type="text" />-->
-<!--                        <option name="es.internal.es.cluster.uuid" value="123" type="text" />-->
+                        <!--<option name="es.internal.es.cluster.uuid" value="123" type="text" />-->
 
+<!--                        <option name="query" value="{&quot;query&quot;: {&quot;terms&quot;:{&quot;_id&quot;: [&quot;l847DYMB7SdlGqYnbMvy&quot;]}}}" type="text" />-->
+<!--                        <option name="es.read.field.as.array.include" value="hits._source.message" type="text" />-->
+<!--                        <option name="es.input.json" value="yes" type="text" />-->
+<!--                        <option name="pushdown" value="true" type="boolean" />-->
                         <option name="es.nodes.client.only" value="false" type="boolean" />
                         <option name="es.nodes.wan.only" value="true" type="boolean" />
                         <option name="es.nodes.discovery" value="false" type="boolean" />
-                        <option name="es.resource" value="index" type="text" />
+<!--                        <option name="es.port" value="9300" type="text" />-->
+<!--                        <option name="es.batch.write.retry.count" value="-1" type="text" />-->
+<!--                        <option name="es.index.auto.create" value="true" type="boolean" />-->
+<!--                        <option name="es.input.use.sliced.partitions" value="false" type="boolean" />-->
+<!--                         <option name="es.resource" value="ic-sti-test-cordis-1-point-dev" type="text" />-->
+<!--                        <option name="es.nodes" value="http://localhost:9200" type="text" />-->
+<!--                        <option name="es.nodes" value="https://dev04.local.cite.gr:9200" type="text" />-->
+                         <option name="es.resource" value="test" type="text" />
                         <option name="es.scroll.size" value="500" type="text" />
+<!--                        <option name="spark.serializer" value="org.apache.spark.serializer.KryoSerializer" type="text" />-->
+                        <!-- <option name="hive.metastore.warehouse.dir" value="C:\Users\vmarantos\Documents\work\spark-warehouse" type="text" />-->
+                        <!--<option name="query" value="{&quot;query&quot;: {&quot;bool&quot;: {&quot;filter&quot;: [{&quot;terms&quot;: {&quot;_id&quot;: [&quot;1641fe41-27d9-4263-a688-96ea18b34f18&quot;]}}],&quot;adjust_pure_negative&quot;:true,&quot;boost&quot;:1.0} }}" type="text" />-->
+
+<!--                        <option name="inferSchema" value="true" type="boolean"/>-->
+<!--                        <option name="es.read.field.as.array.include" value="tags" type="text"/>-->
+
+                        <option name="driver" value="es" type="text"/>
+<!--                        <option name="es.internal.es.version" value="7.17.5" type="text"/>-->
+<!--                        <option name="es.internal.es.cluster.name" value="docker-cluster" type="text"/>-->
+<!--                        <option name="es.internal.es.cluster.uuid" value="zySyjaI2Sz2KXJgXLkN8VQ" type="text"/>-->
+<!--                        <option name="es.net.http.auth.user" value="ic_sti_development" type="text" />-->
+<!--                        <option name="es.net.http.auth.pass" value="50K9zDkWuww6gA0SmiAG" type="text" />-->
+<!--                        <option name="es.nodes.discovery" value="false" type="boolean"/>-->
+<!--                        <option name="es.read.metadata" value="false" type="boolean"/>-->
+<!--                        <option name="es.field.read.empty.as.null" value="no" type="text"/>-->
+<!--                        <option name="es.net.proxy.http.use.system.props" value="no" type="text"/>-->
+<!--                        <option name="pushdown" value="true" type="boolean"/>-->
+<!--                        <option name="es.resource" value="logs-my_app-default" type="text"/>-->
 
                     </options>
                 </entity>
@@ -103,7 +134,7 @@
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
                   format="json" sql="PrimarySQL">
             <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
-            <location>file:output-location</location>
+            <location>file:/Users/vmarantos/Documents/work/datamediator/data/out/test2</location>
             <defaultlocation></defaultlocation>
             <!--Sink Parameters, consumed by the sink processor-->
             <parameters>

@@ -10,18 +10,18 @@
                 <fragment id="4" target="where" conditionals="cond_dateto" enable="all">cast(published as date) &lt;= cast('@{[cr_dateto]}' as date)</fragment>
             </statement>
         </sql>
-        <args>
-		    <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
-		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
-			<arg id="fs" type="text" overridable="true" />
-			<arg id="src" type="text" overridable="true"  />
-			<arg id="dest" type="text" overridable="true"  />
-        </args>
-        <conditionals>
-            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
-			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
-        </conditionals>
     </sqltemplate>
+	<args>
+		<arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		<arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+		<arg id="fs" type="text" overridable="true" />
+		<arg id="src" type="text" overridable="true"  />
+		<arg id="dest" type="text" overridable="true"  />
+	</args>
+	<conditionals>
+		<conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+		<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+	</conditionals>	
     <extenders>
     </extenders>
     <datasources>
@@ -53,7 +53,7 @@
         <datasink id="out" name="MyOut" datatype="euraxess.Out.01"
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
                   format="json" conditionals="" sql="PrimarySQL">
-            <location>@{[fs]}@{[dest]}</location>
+            <location>file:/Users/vmarantos/Documents/work/datamediator/@{[dest]}</location>
             <defaultlocation></defaultlocation>
             <parameters>
 				<parameter name="singleFile" value="true" type="bool" />

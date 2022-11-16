@@ -25,27 +25,27 @@
                 <fragment id="groupby" target="groupby" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type</fragment>
             </statement>
         </sql>
-        <args>
-		    <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
-		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
-            <arg id="cr_publisherlist" type="text" overridable="true" />
-            <arg id="cr_journallist" type="text" overridable="true" />
-            <arg id="cr_projectlist" type="text" overridable="true" />
-            <arg id="cr_funderlist" type="text" overridable="true" />
-
-			<arg id="fs" type="text" overridable="true" />
-			<arg id="src" type="text" overridable="true"  />
-			<arg id="dest" type="text" overridable="true"  />
-        </args>
-        <conditionals>
-            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
-			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
-            <conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
-            <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
-            <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
-            <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>
-        </conditionals>
     </sqltemplate>
+	<args>
+		<arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		<arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+		<arg id="cr_publisherlist" type="text" overridable="true" />
+		<arg id="cr_journallist" type="text" overridable="true" />
+		<arg id="cr_projectlist" type="text" overridable="true" />
+		<arg id="cr_funderlist" type="text" overridable="true" />
+
+		<arg id="fs" type="text" overridable="true" />
+		<arg id="src" type="text" overridable="true"  />
+		<arg id="dest" type="text" overridable="true"  />
+	</args>
+	<conditionals>
+		<conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+		<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+		<conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
+		<conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
+		<conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
+		<conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>
+	</conditionals>
     <extenders>
     </extenders>
     <datasources>
