@@ -4,10 +4,10 @@
         <sql>
             <statement id = "PrimarySQL">
                 <fragment id="sel_base" target="select" enable="always">FullStudy.Study.ProtocolSection.IdentificationModule.NCTId as Id, 
-					FullStudy.Rank as Rank, FullStudy.Study.ProtocolSection.IdentificationModule.OfficialTitle as OfficialTitle, FullStudy.Study.ProtocolSection.DescriptionModule.BriefSummary as BriefSummary,FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate, ctDate(FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate) as convDate")</fragment>	
+					FullStudy.Rank as Rank, FullStudy.Study.ProtocolSection.IdentificationModule.OfficialTitle as OfficialTitle, FullStudy.Study.ProtocolSection.DescriptionModule.BriefSummary as BriefSummary,FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate , ctDate(FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate) as convDate</fragment>	
 				<fragment id="from_result" target="from" enable="always">rclinicals</fragment>
-                <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate &gt;= cast(ctDate('@{[cr_datefrom]}') as date)</fragment>
-                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate &lt;= cast(ctDate('@{[cr_datefrom]}' as date)</fragment>
+               <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate &gt;= cast(ctDate('@{[cr_datefrom]}') as date)</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">FullStudy.Study.ProtocolSection.StatusModule.StatusVerifiedDate &lt;= cast(ctDate('@{[cr_datefrom]}') as date)</fragment>
 				<fragment target="orderby" cond="cond1"  enable="all">FullStudy.Study.ProtocolSection.IdentificationModule.NCTId</fragment>         
             </statement>
         </sql>
@@ -26,6 +26,8 @@
 		   <conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
         </conditionals>
     <extenders>
+	        <extender id="std" type="udfExtender" target="com.citesa.spark.sqlcomposer.StandardUdfLibrary" args="" />
+
     </extenders>
     <datasources>
         <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.source.FileSource" format="json" >
@@ -54,7 +56,7 @@
                 <entity id="result_clinicals"  alias="rclinicals"  type="view" >
 					<content>SELECT * FROM r </content>
 					<cacheable  type="persistent">
-						<location>file:////data/cache/clinicaltrials/@{[sys_arghash]}</location>
+						<location>file:////data/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>
