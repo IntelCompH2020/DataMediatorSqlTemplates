@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+
+            <statement id = "PrimarySQL">
+                <fragment id="sel_base" target="select" enable="always">rpCache.id, rpCache.title, rpCache.paperAbstract, rpCache.year, rpCache.doi, rpCache.journalName, rpCache.venue, collect_list(raCache.name) as authornames</fragment>	
+				<fragment id="from_result" target="from" enable="always">rpCache</fragment>
+				<fragment id="join_result" target="from" enable="always">LEFT JOIN rpaCache ON rpCache.id = rpaCache.paper_id</fragment>
+				<fragment id="join_result2" target="from" enable="always">LEFT JOIN raCache ON rpaCache.author_id = raCache.id</fragment>
+               <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">rpCache.year &gt;= '@{[cr_yearfrom]}'</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">rpCache.year &lt;= '@{[cr_yearto]}'</fragment>	
+			   <fragment id="groupby" target="groupby" enable="always">rpCache.id, rpCache.title, rpCache.paperAbstract, rpCache.year, rpCache.doi, rpCache.journalName, rpCache.venue</fragment>
+
+            </statement>
+        </sql>
+    </sqltemplate>
+        <args>
+		
+		    <arg id="cr_yearfrom" type="date" validation="fullDate" overridable="true" />
+		    <arg id="cr_yearto" type="date" validation="fullDate" overridable="true" />
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
+			<arg id="cache" type="text" overridable="true" />
+        </args>
+        <conditionals>
+           <conditional id="cond_datefrom" test="exists" type="text">@{[cr_yearfrom]}</conditional>
+		   <conditional id="cond_dateto" test="exists" type="text">@{[cr_yearto]}</conditional>
+        </conditionals>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.source.FileSource" format="parquet" >
+            <location>@{[fs]}@{[src]}</location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="result_pa" alias="pa" format="parquet" conditionals="">
+                    <content></content>
+                    <location>paper_author.parquet</location>
+                    <defaultlocation></defaultlocation>
+                </entity>
+                <entity id="result_a" alias="a" format="parquet" conditionals="">
+                    <content></content>
+                    <location>authors.parquet</location>
+                    <defaultlocation></defaultlocation>
+                </entity>
+                <entity id="result_cita" alias="c" format="parquet" conditionals="">
+                    <content></content>
+                    <location>citations.parquet</location>
+                    <defaultlocation></defaultlocation>
+                </entity>
+                <entity id="result_papers" alias="p" format="parquet" conditionals="">
+                    <content></content>
+                    <location>papers.parquet</location>
+                    <defaultlocation></defaultlocation>
+                </entity>				
+                <entity id="result_paCache"  alias="rpaCache"  type="view" >
+					<content>SELECT * FROM pa </content>
+					<cacheable  type="persistent">
+						<location>file:////data/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>				
+                <entity id="result_aCache"  alias="raCache"  type="view" >
+					<content>SELECT * FROM a </content>
+					<cacheable  type="persistent">
+						<location>file:////data/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>	
+                <entity id="result_cCache"  alias="rcCache"  type="view" >
+					<content>SELECT * FROM c </content>
+					<cacheable  type="persistent">
+						<location>file:////data/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>	
+                <entity id="result_pCache"  alias="rpCache"  type="view" >
+					<content>SELECT * FROM p </content>
+					<cacheable  type="persistent">
+						<location>file:////data/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>					
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out" name="MyOut" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" conditionals="" sql="PrimarySQL">
+            <location>@{[fs]}@{[dest]}</location>
+            <defaultlocation></defaultlocation>
+            <parameters>
+            <!--
+				<parameter name="singleFile" value="true" type="bool" />
+            -->
+            </parameters>
+            <options>
+            </options>
+
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>

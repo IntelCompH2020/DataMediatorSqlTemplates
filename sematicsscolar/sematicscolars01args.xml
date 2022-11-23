@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<args>
+    <queryArguments>
+     <cr_yearfrom>2016</cr_yearfrom>
+      <cr_yearto>2018</cr_yearto>
+      <fs>hdfs://ic-devel01.local.cite.gr:8020</fs>
+      <src>/user/SemanticScholar/20220201</src>
+      <dest>/data/out/SemanticScholar</dest>
+    </queryArguments>
+    <programArguments>
+        <explain>true</explain>
+    </programArguments>
+</args>
