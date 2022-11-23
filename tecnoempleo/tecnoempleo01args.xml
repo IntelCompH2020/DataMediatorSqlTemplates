@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<args>
+    <queryArguments>
+      <cr_datefrom>2018-01-01</cr_datefrom>
+      <cr_dateto>2018-01-09</cr_dateto>
+      <fs>hdfs://ic-devel01.local.cite.gr:8020</fs>
+      <src>/user/TecnoEmpleo</src>
+      <dest>/data/out/TecnoEmpleo</dest>
+    </queryArguments>
+    <programArguments>
+        <explain>true</explain>
+    </programArguments>
+</args>
