@@ -15,21 +15,23 @@
             </statement>
         </sql>
     </sqltemplate>
-    <args>
+        <args>
+		
 		     <!-- <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
 		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />-->
 			<arg id="fs" type="text" overridable="true" />
 			<arg id="src" type="text" overridable="true"  />
 			<arg id="dest" type="text" overridable="true"  />
-    </args>
-    <conditionals>
+			<arg id="cache" type="text" overridable="true" />
+        </args>
+        <conditionals>
            <!-- <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
 			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
             <conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
             <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
             <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
             <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>-->
-    </conditionals>
+        </conditionals>
     <extenders>
     </extenders>
     <datasources>
@@ -56,60 +58,71 @@
                     </options>
                
                 </entity>
-                <entity id="result_titles" name="result_titles" alias="rt" tAlias ="tmp_rt" format="parquet" conditionals="">
+                <entity id="result_titles" name="result_titles" alias="rt" tAlias ="tmp_rt" format="parquet" >
 				<content></content>
                     <location>result_titles</location>
 			
                 </entity>			
-                <entity id="result_description" name="result_description" alias="rd" tAlias ="tmp_rd" format="parquet" conditionals="">
+                <entity id="result_description" name="result_description" alias="rd" tAlias ="tmp_rd" format="parquet" >
                     <content></content>
 					<location>result_description</location>
 			
                 </entity>	
-                <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_ra" format="parquet" conditionals="">
+                <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_ra" format="parquet" >
 					<content>SELECT id,fullname FROM tmp_ra</content>
                     <location>result_author</location>
 			
                 </entity>
-                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet" conditionals="">
-				<content></content>
+                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet">
+				<content>SELECT * FROM tmp_rp</content>
                     <location>result_project</location>
 			
                 </entity>			
-                <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" format="parquet" conditionals="">
+                <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
 				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
                     <location>project</location>
-				
                 </entity>	
 				
-                <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" format="view" conditionals="">
+                <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
 					<content>SELECT /*+ BROADCAST(rp) */ rp.id , prj.title, prj.acronym, prj.code  FROM rp 
 					LEFT JOIN prj ON rp.project = prj.id</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>					
-                <entity id="result_rlt" name="result_rlt" alias="rlt" tAlias ="tmp_rlt" format="view" conditionals="">
+				<entity id="result_rlt" name="result_rlt" alias="rlt" tAlias ="tmp_rlt" type="view">
 					<content>SELECT rt.id, collect_list(rt.title) as titles FROM rt GROUP BY rt.id</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>	
-				<entity id="result_rla" name="result_rla" alias="rla" tAlias ="tmp_rla" format="view" conditionals="">
+				<entity id="result_rla" name="result_rla" alias="rla" tAlias ="tmp_rla" type="view">
 					<content>SELECT ra.id, collect_list(ra.fullname) as authors FROM ra GROUP BY ra.id</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>	
-				<entity id="result_rlprj" name="result_rlprj" alias="rlprj" tAlias ="tmp_rlprj" format="view" conditionals="">
+				<entity id="result_rlprj" name="result_rlprj" alias="rlprj" tAlias ="tmp_rlprj" type="view" >
 					<content>SELECT rprj.id, rprj.acronym, rprj.code, collect_list(rprj.title) as projects FROM rprj GROUP BY rprj.id, rprj.acronym, rprj.code</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>	
-				<entity id="result_rld" name="result_rld" alias="rld" tAlias ="tmp_rld" format="view" conditionals="">
+				<entity id="result_rld" name="result_rld" alias="rld" tAlias ="tmp_rld" type="view" >
 					<content>SELECT rd.id, collect_list(rd.description) as descriptions FROM rd GROUP BY rd.id</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>	
-				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" format="view" conditionals="">
+				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
 					<content>SELECT /*+ BROADCAST(r) */ r.id,rlt.titles,rla.authors, rld.descriptions, rlprj.projects, rlprj.acronym, rlprj.code FROM r 
 					LEFT JOIN rlt ON r.id = rlt.id 
 					LEFT JOIN rla ON r.id = rla.id  
 					LEFT JOIN rld ON r.id = rld.id
 					LEFT JOIN rlprj ON r.id = rlprj.id</content>
-					<cacheable  level="DISK_ONLY_2"/>
+					<cacheable  type="persistent">
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
                 </entity>					
             </entities>
         </datasource>
