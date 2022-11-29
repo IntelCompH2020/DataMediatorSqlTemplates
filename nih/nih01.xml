@@ -54,7 +54,7 @@
                 <entity id="result_publications"  alias="rpublications"  type="view" >
 					<content>SELECT * FROM r </content>
 					<cacheable  type="persistent">
-						<location>file:////data/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>
