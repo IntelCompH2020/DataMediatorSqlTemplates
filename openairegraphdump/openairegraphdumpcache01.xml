@@ -9,25 +9,25 @@
               
 			   <fragment id="where_eq_type" target="where" enable="all">r.type = 'publication'</fragment>
 			   
-                 <!-- <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
-                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>-->
+                 <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
          
             </statement>
         </sql>
     </sqltemplate>
         <args>
 		
-		     <!-- <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
-		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />-->
+		     <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
 			<arg id="fs" type="text" overridable="true" />
 			<arg id="src" type="text" overridable="true"  />
 			<arg id="dest" type="text" overridable="true"  />
 			<arg id="cache" type="text" overridable="true" />
         </args>
         <conditionals>
-           <!-- <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
 			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
-            <conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
+            <!--<conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
             <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
             <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
             <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>-->
@@ -87,31 +87,31 @@
 					<content>SELECT /*+ BROADCAST(rp) */ rp.id , prj.title, prj.acronym, prj.code  FROM rp 
 					LEFT JOIN prj ON rp.project = prj.id</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
 				<entity id="result_rlt" name="result_rlt" alias="rlt" tAlias ="tmp_rlt" type="view">
 					<content>SELECT rt.id, collect_list(rt.title) as titles FROM rt GROUP BY rt.id</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
 				<entity id="result_rla" name="result_rla" alias="rla" tAlias ="tmp_rla" type="view">
 					<content>SELECT ra.id, collect_list(ra.fullname) as authors FROM ra GROUP BY ra.id</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
 				<entity id="result_rlprj" name="result_rlprj" alias="rlprj" tAlias ="tmp_rlprj" type="view" >
 					<content>SELECT rprj.id, rprj.acronym, rprj.code, collect_list(rprj.title) as projects FROM rprj GROUP BY rprj.id, rprj.acronym, rprj.code</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
 				<entity id="result_rld" name="result_rld" alias="rld" tAlias ="tmp_rld" type="view" >
 					<content>SELECT rd.id, collect_list(rd.description) as descriptions FROM rd GROUP BY rd.id</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
 				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
@@ -121,7 +121,7 @@
 					LEFT JOIN rld ON r.id = rld.id
 					LEFT JOIN rlprj ON r.id = rlprj.id</content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>

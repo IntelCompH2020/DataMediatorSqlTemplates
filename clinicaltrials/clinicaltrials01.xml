@@ -56,7 +56,7 @@
                 <entity id="result_clinicals"  alias="rclinicals"  type="view" >
 					<content>SELECT * FROM r </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>

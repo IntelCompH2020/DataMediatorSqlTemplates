@@ -60,25 +60,25 @@
                 <entity id="result_paCache"  alias="rpaCache"  type="view" >
 					<content>SELECT * FROM pa </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>				
                 <entity id="result_aCache"  alias="raCache"  type="view" >
 					<content>SELECT * FROM a </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
                 <entity id="result_cCache"  alias="rcCache"  type="view" >
 					<content>SELECT * FROM c </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>	
                 <entity id="result_pCache"  alias="rpCache"  type="view" >
 					<content>SELECT * FROM p </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>

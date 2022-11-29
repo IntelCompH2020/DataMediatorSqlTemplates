@@ -52,7 +52,7 @@
                 <entity id="result_te"  alias="rte"  type="view" >
 					<content>SELECT * FROM te </content>
 					<cacheable  type="persistent">
-						<location>@{[fs]}@{[dest]}/cache/@{[sys_arghash]}</location>
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>
