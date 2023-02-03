@@ -6,7 +6,7 @@
                 <fragment id="sel_base" target="select" enable="always">*</fragment>	
 				<fragment id="from_result" target="from" enable="always">rpublications</fragment>
                <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">PUB_DATE &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
-                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">PUB_DATE &lt;= cast('@{[cr_datefrom]}' as date)</fragment>       
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">PUB_DATE &lt;= cast('@{[cr_dateto]}' as date)</fragment>
             </statement>
         </sql>
     </sqltemplate>
