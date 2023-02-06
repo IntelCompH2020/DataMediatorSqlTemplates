@@ -3,7 +3,7 @@
     <sqltemplate>
         <sql>
             <statement id = "PrimarySQL">
-                <fragment id="sel_base" target="select" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type, rl.titles, rl.authors, rl.descriptions, rl.projects</fragment>	
+                <fragment id="sel_base" target="select" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type, rl.titles, rl.authors, rl.descriptions, rl.projects, rl.funder</fragment>
 				<fragment id="from_result" target="from" enable="always">r</fragment>
 				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
               
@@ -81,10 +81,13 @@
                 <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
 				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
                     <location>project</location>
-                </entity>	
+                </entity>
+                <entity id="project_funding" name="project_funding" alias="pf" tAlias ="tmp_PF" format="parquet" conditionals="">
+                    <location>project_funding</location>
+                </entity>
 				
                 <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
-					<content>SELECT /*+ BROADCAST(rp) */ rp.id , prj.title, prj.acronym, prj.code  FROM rp 
+					<content>SELECT /*+ BROADCAST(rp) */ rp.id , rp.project prj.title, prj.acronym, prj.code  FROM rp
 					LEFT JOIN prj ON rp.project = prj.id</content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
@@ -113,13 +116,20 @@
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
-                </entity>	
+                </entity>
+                <entity id="result_rpf" name="result_rpf" alias="rpf" tAlias ="tmp_rpf" type="view" >
+                    <content>SELECT * FROM pf</content>
+                    <cacheable  type="persistent">
+                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
+                    </cacheable  >
+                </entity>
 				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
-					<content>SELECT /*+ BROADCAST(r) */ r.id,rlt.titles,rla.authors, rld.descriptions, rlprj.projects, rlprj.acronym, rlprj.code FROM r 
+					<content>SELECT /*+ BROADCAST(r) */ r.id,rlt.titles,rla.authors, rld.descriptions, rlprj.projects, rlprj.acronym, rlprj.code, rpf.funder FROM r
 					LEFT JOIN rlt ON r.id = rlt.id 
 					LEFT JOIN rla ON r.id = rla.id  
 					LEFT JOIN rld ON r.id = rld.id
-					LEFT JOIN rlprj ON r.id = rlprj.id</content>
+					LEFT JOIN rlprj ON r.id = rlprj.id
+                    LEFT JOIN rpf ON rlprj.project = rpf.id</content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
