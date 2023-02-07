@@ -106,7 +106,7 @@
 					</cacheable  >
                 </entity>	
 				<entity id="result_rlprj" name="result_rlprj" alias="rlprj" tAlias ="tmp_rlprj" type="view" >
-					<content>SELECT rprj.id, rprj.acronym, rprj.code, collect_list(rprj.title) as projects, rprj.project as prjId FROM rprj GROUP BY rprj.id, rprj.acronym, rprj.code</content>
+					<content>SELECT rprj.id, rprj.acronym, rprj.code, collect_list(rprj.title) as projects, rprj.project as prjId FROM rprj GROUP BY rprj.id, rprj.acronym, rprj.code, rprj.project</content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
 					</cacheable  >
