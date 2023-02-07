@@ -87,7 +87,7 @@
                 </entity>
 				
                 <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
-					<content>SELECT /*+ BROADCAST(rp) */ rp.id , rp.project prj.title, prj.acronym, prj.code  FROM rp
+					<content>SELECT /*+ BROADCAST(rp) */ rp.id , rp.project, prj.title, prj.acronym, prj.code  FROM rp
 					LEFT JOIN prj ON rp.project = prj.id</content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
