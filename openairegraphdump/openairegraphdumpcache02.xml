@@ -3,12 +3,12 @@
     <sqltemplate>
         <sql>
             <statement id = "PrimarySQL">
-                <fragment id="sel_base" target="select" enable="always">r.id, r.bestaccessrights, r.embargoenddate, rl.g_pids, rl.g_prjs, rl.g_orgs, rl.g_funders</fragment>
+                <fragment id="sel_base" target="select" enable="always">r.id, r.bestaccessrights, r.embargoenddate, rl.g_pids, rl.g_prj, rl.g_orgs</fragment>
 				<fragment id="from_result" target="from" enable="always">r</fragment>
 				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
               
 			   <fragment id="where_eq_type" target="where" enable="all">r.type = 'publication'</fragment>
-
+                <fragment id="where_prj_not_null" target="where" enable="all">isnotnull(rl.g_prj)</fragment>
 			   
                  <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
                 <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
@@ -60,12 +60,9 @@
                
                 </entity>
                 <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet">
-				<content>SELECT * FROM tmp_rp</content>
                     <location>result_project</location>
-			
                 </entity>			
                 <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
-				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
                     <location>project</location>
                 </entity>
                 <entity id="project_funding" name="project_funding" alias="pf" tAlias ="tmp_PF" format="parquet" conditionals="">
@@ -81,9 +78,9 @@
                     <location>result_instance_pid</location>
                 </entity>
 
-                <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
+                <entity id="result_rprj" name="result_rprj" alias="rprj" tAlias ="tmp_rprj" type="view" >
                     <content>SELECT prj.id,
-                        collect_list(DISTINCT struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency, pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2)) as g_prj
+                        collect_list(struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency, pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2)) as g_prj
                         FROM prj
                         LEFT JOIN pf ON pf.id = prj.id
                         WHERE isnotnull(prj.id)
@@ -129,8 +126,8 @@
 					</cacheable  >
                 </entity>
 				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
-					<content>SELECT r.id, rprj.g_prj, rprj.g_funders, rprj.g_orgs, rlipid.g_pids FROM r
-					LEFT JOIN rprj ON r.id = rprj.id
+					<content>SELECT r.id, rlp.g_prj, rlp.g_orgs, rlipid.g_pids FROM r
+					LEFT JOIN rlp ON r.id = rlp.id
 					LEFT JOIN rlipid ON r.id = rlipid.result</content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
