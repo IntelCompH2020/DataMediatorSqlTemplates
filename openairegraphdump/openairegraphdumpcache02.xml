@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "PrimarySQL">
+                <fragment id="sel_base" target="select" enable="always">r.id, r.bestaccessrights, r.embargoenddate, rl.g_pids, rl.g_prjs, rl.g_orgs, rl.g_funders</fragment>
+				<fragment id="from_result" target="from" enable="always">r</fragment>
+				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
+              
+			   <fragment id="where_eq_type" target="where" enable="all">r.type = 'publication'</fragment>
+
+			   
+                 <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
+         
+            </statement>
+        </sql>
+    </sqltemplate>
+        <args>
+		
+		     <arg id="cr_datefrom" type="date" validation="fullDate" overridable="true" />
+		    <arg id="cr_dateto" type="date" validation="fullDate" overridable="true" />
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
+			<arg id="cache" type="text" overridable="true" />
+        </args>
+        <conditionals>
+            <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
+			<conditional id="cond_dateto" test="exists" type="text">@{[cr_dateto]}</conditional>
+            <!--<conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
+            <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
+            <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
+            <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>-->
+        </conditionals>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.source.FileSource" format="parquet" >
+            <location>@{[fs]}@{[src]}</location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="result" name="result" alias="r" tAlias ="tmp_R" format="parquet" conditionals="">
+                    <content></content>
+                    <location>result</location>
+                    <defaultlocation></defaultlocation>
+                   
+                    <options>
+                        <option name="multiLine" value="true" type="bool" />
+                        <option name="mode" value="PERMISSIVE" type="text" />
+                        <option name="wholeFile" value="true" type="text" />
+                        <option name="delimiter" value="," type="text" />
+                        <option name="header" value="true" type="text" />
+                        <option name="enforceSchema" value="false" type="text" />
+                        <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
+                        <option name="mode" value="DROPMALFORMED" type="text" />
+                    </options>
+               
+                </entity>
+                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet">
+				<content>SELECT * FROM tmp_rp</content>
+                    <location>result_project</location>
+			
+                </entity>			
+                <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
+				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
+                    <location>project</location>
+                </entity>
+                <entity id="project_funding" name="project_funding" alias="pf" tAlias ="tmp_PF" format="parquet" conditionals="">
+                    <location>project_funding</location>
+                </entity>
+                <entity id="project_organizations" name="project_organizations" alias="po" tAlias ="tmp_PO" format="parquet" conditionals="">
+                    <location>project_organizations</location>
+                </entity>
+                <entity id="organization" name="organization" alias="org" tAlias ="tmp_ORG" format="parquet" conditionals="">
+                    <location>organization</location>
+                </entity>
+                <entity id="result_instance_pid" name="result_instance_pid" alias="ripid" tAlias ="tmp_RIPID" format="parquet" conditionals="">
+                    <location>result_instance_pid</location>
+                </entity>
+
+                <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
+                    <content>SELECT prj.id,
+                        collect_list(DISTINCT struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency, pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2)) as g_prj
+                        FROM prj
+                        LEFT JOIN pf ON pf.id = prj.id
+                        WHERE isnotnull(prj.id)
+                        GROUP BY prj.id
+                    </content>
+                    <cacheable  type="persistent">
+                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
+                    </cacheable  >
+                </entity>
+
+                <entity id="result_org" name="result_org" alias="rorg" tAlias ="tmp_rorg" type="view" >
+                    <content>SELECT org.id,
+                        collect_list(DISTINCT struct(org.name, org.legalshortname, org.country)) as g_orgs
+                        FROM org
+                        GROUP BY org.id
+                    </content>
+                    <cacheable  type="persistent">
+                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
+                    </cacheable  >
+                </entity>
+				
+                <entity id="result_rp" name="result_rp" alias="rlp" tAlias ="tmp_rlp" type="view" >
+					<content>SELECT rp.id,
+                    rprj.g_prj,
+                    rorg.g_orgs
+                    FROM rp
+					LEFT JOIN rprj ON rp.project = rprj.id
+                    LEFT JOIN po ON rp.project = po.id
+                    LEFT JOIN rorg ON po.organization = rorg.id
+                    WHERE isnotnull(rp.project)
+                    </content>
+					<cacheable  type="persistent">
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>
+				<entity id="result_rlipid" name="result_rlipid" alias="rlipid" tAlias ="tmp_rlipid" type="view" >
+					<content>SELECT ripid.result, collect_list(DISTINCT struct(ripid.type, ripid.pid)) as g_pids
+                        FROM ripid
+                        WHERE ripid.type = 'Digital Object Identifier'
+                        GROUP BY ripid.result</content>
+					<cacheable  type="persistent">
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>
+				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
+					<content>SELECT r.id, rprj.g_prj, rprj.g_funders, rprj.g_orgs, rlipid.g_pids FROM r
+					LEFT JOIN rprj ON r.id = rprj.id
+					LEFT JOIN rlipid ON r.id = rlipid.result</content>
+					<cacheable  type="persistent">
+						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					</cacheable  >
+                </entity>					
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out" name="MyOut" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" conditionals="" sql="PrimarySQL">
+            <location>@{[fs]}@{[dest]}</location>
+            <defaultlocation></defaultlocation>
+            <parameters>
+            <!--
+				<parameter name="singleFile" value="true" type="bool" />
+            -->
+            </parameters>
+            <options>
+            </options>
+
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>
