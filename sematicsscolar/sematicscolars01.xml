@@ -4,13 +4,11 @@
         <sql>
 
             <statement id = "PrimarySQL">
-                <fragment id="sel_base" target="select" enable="always">rpCache.id, rpCache.title, rpCache.paperAbstract, rpCache.year, rpCache.doi, rpCache.journalName, rpCache.venue, collect_list(raCache.name) as authornames</fragment>	
-				<fragment id="from_result" target="from" enable="always">rpCache</fragment>
-				<fragment id="join_result" target="from" enable="always">LEFT JOIN rpaCache ON rpCache.id = rpaCache.paper_id</fragment>
-				<fragment id="join_result2" target="from" enable="always">LEFT JOIN raCache ON rpaCache.author_id = raCache.id</fragment>
-               <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">rpCache.year &gt;= '@{[cr_yearfrom]}'</fragment>
-                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">rpCache.year &lt;= '@{[cr_yearto]}'</fragment>	
-			   <fragment id="groupby" target="groupby" enable="always">rpCache.id, rpCache.title, rpCache.paperAbstract, rpCache.year, rpCache.doi, rpCache.journalName, rpCache.venue</fragment>
+                <fragment id="sel_base" target="select" enable="always">p.id, p.title, p.paperAbstract, p.year, p.doi, p.journalName, p.venue, rpaCache.authornames</fragment>
+				<fragment id="from_result" target="from" enable="always">p</fragment>
+                <fragment id="join_rpa" target="from" enable="all">LEFT JOIN rpaCache ON rpaCache.id = p.id</fragment>
+               <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">p.year &gt;= '@{[cr_yearfrom]}'</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">p.year &lt;= '@{[cr_yearto]}'</fragment>
 
             </statement>
         </sql>
@@ -56,31 +54,18 @@
                     <content></content>
                     <location>papers.parquet</location>
                     <defaultlocation></defaultlocation>
-                </entity>				
+                </entity>
+
                 <entity id="result_paCache"  alias="rpaCache"  type="view" >
-					<content>SELECT * FROM pa </content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
-					</cacheable  >
-                </entity>				
-                <entity id="result_aCache"  alias="raCache"  type="view" >
-					<content>SELECT * FROM a </content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
-					</cacheable  >
-                </entity>	
-                <entity id="result_cCache"  alias="rcCache"  type="view" >
-					<content>SELECT * FROM c </content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
-					</cacheable  >
-                </entity>	
-                <entity id="result_pCache"  alias="rpCache"  type="view" >
-					<content>SELECT * FROM p </content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
-					</cacheable  >
-                </entity>					
+                    <content>SELECT p.id, collect_list(a.name) as authornames FROM p
+                        LEFT JOIN pa ON pa.paper_id = p.id
+                        LEFT JOIN a ON pa.author_id = a.id
+                        GROUP BY p.id
+                    </content>
+                    <cacheable  type="persistent">
+                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
+                    </cacheable  >
+                </entity>
             </entities>
         </datasource>
     </datasources>

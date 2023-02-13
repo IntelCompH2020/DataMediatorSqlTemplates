@@ -7,12 +7,11 @@
 				<fragment id="from_result" target="from" enable="always">r</fragment>
 				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
               
-			   <fragment id="where_eq_type" target="where" enable="all">r.type = 'publication'</fragment>
-                <fragment id="where_prj_not_null" target="where" enable="all">isnotnull(rl.g_prj)</fragment>
+			   <fragment id="where_eq_type" target="where" enable="always">r.type = 'publication'</fragment>
+                <fragment id="where_prj_not_null" target="where" enable="always">isnotnull(rl.g_prj)</fragment>
 			   
                  <fragment id="where_qa_df" target="where" conditionals="cond_datefrom" enable="all">r.dateofcollection &gt;= cast('@{[cr_datefrom]}' as date)</fragment>
                 <fragment id="where_qa_dt" target="where" conditionals="cond_dateto" enable="all">r.dateofcollection &lt;= cast('@{[cr_dateto]}' as date)</fragment>
-         
             </statement>
         </sql>
     </sqltemplate>
@@ -80,22 +79,9 @@
 
                 <entity id="result_rprj" name="result_rprj" alias="rprj" tAlias ="tmp_rprj" type="view" >
                     <content>SELECT prj.id,
-                        collect_list(struct(prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency, pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2)) as g_prj
+                        prj.title, prj.acronym, prj.code, prj.callidentifier, prj.startdate, prj.enddate, prj.totalcost, prj.currency, pf.funder, pf.funding_lvl0, pf.funding_lvl1, pf.funding_lvl2
                         FROM prj
                         LEFT JOIN pf ON pf.id = prj.id
-                        WHERE isnotnull(prj.id)
-                        GROUP BY prj.id
-                    </content>
-                    <cacheable  type="persistent">
-                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
-                    </cacheable  >
-                </entity>
-
-                <entity id="result_org" name="result_org" alias="rorg" tAlias ="tmp_rorg" type="view" >
-                    <content>SELECT org.id,
-                        collect_list(DISTINCT struct(org.name, org.legalshortname, org.country)) as g_orgs
-                        FROM org
-                        GROUP BY org.id
                     </content>
                     <cacheable  type="persistent">
                         <location>@{[fs]}/cache/@{[sys_arghash]}</location>
@@ -104,13 +90,14 @@
 				
                 <entity id="result_rp" name="result_rp" alias="rlp" tAlias ="tmp_rlp" type="view" >
 					<content>SELECT rp.id,
-                    rprj.g_prj,
-                    rorg.g_orgs
+                    collect_list(DISTINCT struct(rprj.title, rprj.acronym, rprj.code, rprj.callidentifier, rprj.startdate, rprj.enddate, rprj.totalcost, rprj.currency, rprj.funder, rprj.funding_lvl0, rprj.funding_lvl1, rprj.funding_lvl2)) as g_prj,
+                    collect_list(DISTINCT struct(org.name, org.legalshortname, org.country)) as g_orgs
                     FROM rp
 					LEFT JOIN rprj ON rp.project = rprj.id
                     LEFT JOIN po ON rp.project = po.id
-                    LEFT JOIN rorg ON po.organization = rorg.id
-                    WHERE isnotnull(rp.project)
+                    LEFT JOIN org ON po.organization = org.id
+                    WHERE isnotnull(rprj.title)
+                    GROUP BY rp.id
                     </content>
 					<cacheable  type="persistent">
 						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
