@@ -3,7 +3,7 @@
     <sqltemplate>
         <sql>
             <statement id = "PrimarySQL">
-                <fragment id="sel_base" target="select" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type, rl.titles, rl.authors, rl.descriptions, rl.projects, rl.funder, rl.funding_lvl0, rl.funding_lvl1, rl.funding_lvl2</fragment>
+                <fragment id="sel_base" target="select" enable="always">r.id, r.dateofcollection, r.publisher, r.journal, r.bestaccessrights, r.language, r.dateofacceptance, r.embargoenddate, r.type, rl.titles, rl.authors, rl.descriptions, rl.projects</fragment>
 				<fragment id="from_result" target="from" enable="always">r</fragment>
 				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
               
@@ -23,6 +23,7 @@
 			<arg id="src" type="text" overridable="true"  />
 			<arg id="dest" type="text" overridable="true"  />
 			<arg id="cache" type="text" overridable="true" />
+            <arg id="cache_metadata" type="text" overridable="true" />
         </args>
         <conditionals>
             <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
@@ -82,56 +83,61 @@
 				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
                     <location>project</location>
                 </entity>
-                <entity id="project_funding" name="project_funding" alias="pf" tAlias ="tmp_PF" format="parquet" conditionals="">
-                    <location>project_funding</location>
-                </entity>
 				
                 <entity id="result_prj" name="result_prj" alias="rprj" tAlias ="tmp_rprj" type="view" >
-					<content>SELECT rp.id , rp.project, prj.title, prj.acronym, prj.code  FROM rp
-					LEFT JOIN prj ON rp.project = prj.id</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<content>SELECT rp.id , collect_list(prj.title) as projects  FROM rp
+					LEFT JOIN prj ON rp.project = prj.id
+                    GROUP BY rp.id</content>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Project Join and Group By"
+                                policy="Standard">
+						<location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>					
 				<entity id="result_rlt" name="result_rlt" alias="rlt" tAlias ="tmp_rlt" type="view">
 					<content>SELECT rt.id, collect_list(rt.title) as titles FROM rt GROUP BY rt.id</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Title Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>	
 				<entity id="result_rla" name="result_rla" alias="rla" tAlias ="tmp_rla" type="view">
 					<content>SELECT ra.id, collect_list(ra.fullname) as authors FROM ra GROUP BY ra.id</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Author Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
-                </entity>	
-				<entity id="result_rlprj" name="result_rlprj" alias="rlprj" tAlias ="tmp_rlprj" type="view" >
-					<content>SELECT rprj.id, rprj.acronym, rprj.code, collect_list(rprj.title) as projects, rprj.project as prjId FROM rprj GROUP BY rprj.id, rprj.acronym, rprj.code, rprj.project</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
-					</cacheable  >
-                </entity>	
+                </entity>
 				<entity id="result_rld" name="result_rld" alias="rld" tAlias ="tmp_rld" type="view" >
 					<content>SELECT rd.id, collect_list(rd.description) as descriptions FROM rd GROUP BY rd.id</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Description Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>
-                <entity id="result_rpf" name="result_rpf" alias="rpf" tAlias ="tmp_rpf" type="view" >
-                    <content>SELECT * FROM pf</content>
-                    <cacheable  type="persistent">
-                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
-                    </cacheable  >
-                </entity>
 				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
-					<content>SELECT r.id,rlt.titles,rla.authors, rld.descriptions, rlprj.projects, rlprj.acronym, rlprj.code, rlprj.prjId, rpf.funder, rpf.funding_lvl0, rpf.funding_lvl1, rpf.funding_lvl2 FROM r
+					<content>SELECT r.id,rlt.titles,rla.authors, rld.descriptions, rprj.projects FROM r
 					LEFT JOIN rlt ON r.id = rlt.id 
 					LEFT JOIN rla ON r.id = rla.id  
 					LEFT JOIN rld ON r.id = rld.id
-					LEFT JOIN rlprj ON r.id = rlprj.id
-                    LEFT JOIN rpf ON rlprj.prjId = rpf.id</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					LEFT JOIN rprj ON r.id = rprj.id</content>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Final Join"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>

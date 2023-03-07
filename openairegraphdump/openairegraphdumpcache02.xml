@@ -23,6 +23,7 @@
 			<arg id="src" type="text" overridable="true"  />
 			<arg id="dest" type="text" overridable="true"  />
 			<arg id="cache" type="text" overridable="true" />
+            <arg id="cache_metadata" type="text" overridable="true" />
         </args>
         <conditionals>
             <conditional id="cond_datefrom" test="exists" type="text">@{[cr_datefrom]}</conditional>
@@ -83,8 +84,13 @@
                         FROM prj
                         LEFT JOIN pf ON pf.id = prj.id
                     </content>
-                    <cacheable  type="persistent">
-                        <location>@{[fs]}/cache/@{[sys_arghash]}</location>
+                    <cacheable  type="persistent"
+                                id="oagdc2"
+                                args="@{[src]}"
+                                desc="Project and Founder Join Table"
+                                policy="Standard"
+                    >
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
                     </cacheable  >
                 </entity>
 				
@@ -99,8 +105,13 @@
                     WHERE isnotnull(rprj.title)
                     GROUP BY rp.id
                     </content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                        id="oagdc2"
+                        args="@{[src]}"
+                        desc="Project, Funder and organization JOIN and GROUP BY Table"
+                        policy="Standard"
+                    >
+						<location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>
 				<entity id="result_rlipid" name="result_rlipid" alias="rlipid" tAlias ="tmp_rlipid" type="view" >
@@ -108,16 +119,26 @@
                         FROM ripid
                         WHERE ripid.type = 'Digital Object Identifier'
                         GROUP BY ripid.result</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                                id="oagdc2"
+                                args="@{[src]}"
+                                desc="PID GROUP BY Table"
+                                policy="Standard"
+                    >
+						<location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>
 				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
 					<content>SELECT r.id, rlp.g_prj, rlp.g_orgs, rlipid.g_pids FROM r
 					LEFT JOIN rlp ON r.id = rlp.id
 					LEFT JOIN rlipid ON r.id = rlipid.result</content>
-					<cacheable  type="persistent">
-						<location>@{[fs]}/cache/@{[sys_arghash]}</location>
+					<cacheable  type="persistent"
+                                id="oagdc2"
+                                args="@{[src]}"
+                                desc="Last Join Table"
+                                policy="Standard"
+                    >
+						<location>@{[fs]}/cache/@{[cache_hash]}</location>
 					</cacheable  >
                 </entity>					
             </entities>
