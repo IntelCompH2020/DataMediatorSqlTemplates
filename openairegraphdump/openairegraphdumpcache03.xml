@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <sqltemplate>
+        <sql>
+            <statement id = "PrimarySQL">
+                <fragment id="sel_base" target="select" enable="always">r.id, rl.titles, rl.abstracts, rl.pids, rl.dateofacceptances, rl.datasources, rl.journals, rl.organizations, rl.countries, rl.citations, rl.citvenues, rl.references, rl.refvenues</fragment>
+				<fragment id="from_result" target="from" enable="always">r</fragment>
+				<fragment id="from_resulttitle" target="from" enable="always">LEFT JOIN rl ON r.id = rl.id</fragment>
+              
+			   <fragment id="where_eq_type" target="where" enable="all">r.type = 'publication'</fragment>
+			   
+                 <fragment id="where_qa_df" target="where" conditionals="cond_yearfrom" enable="all">date_format(r.dateofacceptance, "yyyy") &gt;= @{[cr_yearfrom]}</fragment>
+                <fragment id="where_qa_dt" target="where" conditionals="cond_yearto" enable="all">date_format(r.dateofacceptance, "yyyy") &lt;= @{[cr_yearto]}</fragment>
+         
+            </statement>
+        </sql>
+    </sqltemplate>
+        <args>
+		
+            <arg id="cr_yearfrom" type="text" overridable="true" />
+		    <arg id="cr_yearto" type="text" overridable="true" />
+			<arg id="fs" type="text" overridable="true" />
+			<arg id="src" type="text" overridable="true"  />
+			<arg id="dest" type="text" overridable="true"  />
+			<arg id="cache" type="text" overridable="true" />
+            <arg id="cache_metadata" type="text" overridable="true" />
+        </args>
+        <conditionals>
+            <conditional id="cond_yearfrom" test="exists" type="text">@{[cr_yearfrom]}</conditional>
+			<conditional id="cond_yearto" test="exists" type="text">@{[cr_yearto]}</conditional>
+            <!--<conditional id="cond_publishers" test="exists" type="text">@{[cr_publisherlist]}</conditional>
+            <conditional id="cond_journals" test="exists" type="text">@{[cr_journallist]}</conditional>
+            <conditional id="cond_projects" test="exists" type="text">@{[cr_projectlist]}</conditional>
+            <conditional id="cond_funders" test="exists" type="text">@{[cr_funderlist]}</conditional>-->
+        </conditionals>
+    <extenders>
+    </extenders>
+    <datasources>
+        <datasource id="csv1" name="MyDataset" datatype="com.citesa.intelcomp.cataloguehelper.datasettypes.GenericFileFolderBasedDataset" storetype="com.citesa.spark.sqlcomposer.source.FileSource" format="parquet" >
+            <location>@{[fs]}@{[src]}</location>
+            <defaultlocation></defaultlocation>
+            <options>
+            </options>
+            <entities>
+                <entity id="result" name="result" alias="r" tAlias ="tmp_R" format="parquet" conditionals="">
+                    <content></content>
+                    <location>result</location>
+                    <defaultlocation></defaultlocation>
+                   
+                    <options>
+                        <option name="multiLine" value="true" type="bool" />
+                        <option name="mode" value="PERMISSIVE" type="text" />
+                        <option name="wholeFile" value="true" type="text" />
+                        <option name="delimiter" value="," type="text" />
+                        <option name="header" value="true" type="text" />
+                        <option name="enforceSchema" value="false" type="text" />
+                        <option name="unescapedQuoteHandling" value="STOP_AT_CLOSING_QUOTE" type="text" />
+                        <option name="mode" value="DROPMALFORMED" type="text" />
+                    </options>
+               
+                </entity>
+                <entity id="result_titles" name="result_titles" alias="rt" tAlias ="tmp_rt" format="parquet" >
+				<content></content>
+                    <location>result_titles</location>
+			
+                </entity>			
+                <entity id="result_description" name="result_description" alias="rd" tAlias ="tmp_rd" format="parquet" >
+                    <content></content>
+					<location>result_description</location>
+			
+                </entity>	
+                <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_ra" format="parquet" >
+					<content>SELECT id,fullname FROM tmp_ra</content>
+                    <location>result_author</location>
+                </entity>
+                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet">
+				<content>SELECT * FROM tmp_rp</content>
+                    <location>result_project</location>
+			
+                </entity>			
+                <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
+				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
+                    <location>project</location>
+                </entity>
+                <entity id="result_instance" name="result_instance" alias="ri" tAlias="tmp_ri" format="parquet">
+                    <content>SELECT result,hostedby FROM tmp_ri</content>
+                    <location>result_instance</location>
+                </entity>
+                <entity id="datasource" name="datasource" alias="d" tAlias="tmp_d" format="parquet">
+                    <content>SELECT id,name,type FROM tmp_d</content>
+                    <location>datasource</location>
+                </entity>
+                <entity id="result_instance_pid" name="result_instance_pid" alias="pids" tAlias="tmp_pids" format="parquet">
+                    <content>SELECT pid,result,type FROM tmp_pids</content>
+                    <location>result_instance_pid</location>
+                </entity>
+                <entity id="result_affiliation" name="result_affiliation" alias="ro" tAlias="tmp_ro" format="parquet">
+                    <content>SELECT id,organization FROM tmp_ro</content>
+                    <location>result_affiliation</location>
+                </entity>
+                <entity id="result_citations" name="result_citations" alias="cout" tAlias="tmp_cout" format="parquet">
+                    <content>SELECT id,target FROM tmp_cout</content>
+                    <location>result_citations</location>
+                </entity>
+                <entity id="organization" name="organization" alias="o" tAlias="tmp_o" format="parquet">
+                    <content>SELECT id,name,country FROM tmp_o</content>
+                    <location>organization</location>
+                </entity>
+
+
+                <entity id="result_rlo" name="result_rlo" alias="rlo" tAlias ="tmp_rlo" type="view" >
+					<content>SELECT ro.id, collect_set(DISTINCT o.name as organization) as organizations,
+                        collect_set(DISTINCT o.country) as countries
+                        FROM ro
+                        LEFT OUTER JOIN o ON ro.organization = o.id
+                    GROUP BY ro.id</content>
+					<cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Organization JOIN and GROUP BY"
+                                policy="Standard">
+						<location>@{[fs]}/cache/@{[cache_hash]}</location>
+					</cacheable  >
+                </entity>
+                <entity id="result_rlds" name="result_rlds" alias="rlds" tAlias ="tmp_rlds" type="view" >
+                    <content>SELECT ri.result as id, collect_set(d.name) as datasources
+                        FROM ri
+                        LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
+                        GROUP BY ri.result</content>
+                    <cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Datasource Journal JOIN and GROUP BY"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+                    </cacheable  >
+                </entity>
+                <entity id="result_rlpid" name="result_rlpid" alias="rlpid" tAlias ="tmp_rlpid" type="view" >
+                    <content>SELECT pids.result as id, collect_set(DISTINCT pids.pid) as pids
+                        FROM pids
+                        WHERE pids.type='Digital Object Identifier'
+                        GROUP BY pids.result</content>
+                    <cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="PID JOIN and GROUP BY"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+                    </cacheable  >
+                </entity>
+				<entity id="result_rlt" name="result_rlt" alias="rlt" tAlias ="tmp_rlt" type="view">
+					<content>SELECT rt.id, collect_list(rt.title) as titles FROM rt GROUP BY rt.id</content>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Title Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+					</cacheable  >
+                </entity>
+				<entity id="result_rld" name="result_rld" alias="rld" tAlias ="tmp_rld" type="view" >
+					<content>SELECT rd.id, collect_list(rd.description) as abstracts FROM rd GROUP BY rd.id</content>
+					<cacheable  type="persistent"
+                                id="oagdc1"
+                                args="@{[src]}"
+                                desc="Description Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+					</cacheable  >
+                </entity>
+                <entity id="result_rlout" name="result_rlout" alias="rlout" tAlias ="tmp_rlout" type="view" >
+                    <content>SELECT cout.id, count(ri.result as outid) as citations,
+                        collect_set(DISTINCT d.name as outdatasrc) as citvenues
+                        FROM cout
+                        LEFT OUTER JOIN ri ON cout.id = ri.id
+                        LEFT OUTER JOIN d ON d.id = ri.hostedby
+                        GROUP BY cout.id</content>
+                    <cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Citations Out Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+                    </cacheable  >
+                </entity>
+                <entity id="result_rlin" name="result_rlin" alias="rlin" tAlias ="tmp_rlin" type="view" >
+                    <content>SELECT cout.target as id, count(cout.id as cintid) as references,
+                        collect_set(DISTINCT d.name as indatasrc) as refvenues
+                        FROM cout
+                        LEFT OUTER JOIN ri ON cout.id = ri.result
+                        LEFT OUTER JOIN d ON d.id = ri.hostedby
+                        GROUP BY cout.id</content>
+                    <cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Citaitions in Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+                    </cacheable  >
+                </entity>
+                <entity id="result_rlr" name="result_rlr" alias="rlr" tAlias ="tmp_rlr" type="view" >
+                    <content>SELECT r.id, collect_set(DISTINCT r.dateofacceptance) as dateofacceptances,
+                        collect_set(DISTINCT r.journal) as journals
+                        FROM r
+                        GROUP BY r.id</content>
+                    <cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Result Group By"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+                    </cacheable  >
+                </entity>
+				<entity id="result_rl" name="result_rl" alias="rl" tAlias ="tmp_rl" type="view">
+					<content>SELECT r.id,rlt.titles, rld.abstracts, rlpid.pids,
+                        rlr.dateofacceptances, rlds.datasources, rlr.journals, rlo.organizations,
+                        rlo.countries, rlout.citations, rlout.citvenues, rlin.references, rlin.refvenues
+                        FROM r
+					    LEFT OUTER JOIN rlt ON r.id = rlt.id
+					    LEFT OUTER JOIN rlpid ON r.id = rlpid.id
+					    LEFT OUTER JOIN rld ON r.id = rld.id
+					    LEFT OUTER JOIN rlr ON r.id = rlr.id
+                        LEFT OUTER JOIN rlds ON r.id = rlds.id
+                        LEFT OUTER JOIN rlo ON r.id = rlo.id
+                        LEFT OUTER JOIN rlout ON r.id = rlout.id
+                        LEFT OUTER JOIN rlin ON r.id = rlin.id
+                    </content>
+					<cacheable  type="persistent"
+                                id="oagdc3"
+                                args="@{[src]}"
+                                desc="Final Join"
+                                policy="Standard">
+                        <location>@{[fs]}/cache/@{[cache_hash]}</location>
+					</cacheable  >
+                </entity>					
+            </entities>
+        </datasource>
+    </datasources>
+    <datasinks>
+        <datasink id="out" name="MyOut" datatype="openairegraph.pubs.01"
+                  storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
+                  format="json" conditionals="" sql="PrimarySQL">
+            <location>@{[fs]}@{[dest]}</location>
+            <defaultlocation></defaultlocation>
+            <parameters>
+            <!--
+				<parameter name="singleFile" value="true" type="bool" />
+            -->
+            </parameters>
+            <options>
+            </options>
+
+        </datasink>
+    </datasinks>
+    <executionOptions>
+        <executionOption name="stdOutSql" value="false" type="bool" />
+        <executionOption name="explain" value="false" type="bool" />
+    </executionOptions>
+</document>
