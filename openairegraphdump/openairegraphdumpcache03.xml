@@ -109,7 +109,7 @@
 
 
                 <entity id="result_rlo" name="result_rlo" alias="rlo" tAlias ="tmp_rlo" type="view" >
-					<content>SELECT ro.id, collect_set(DISTINCT o.name as organization) as organizations,
+					<content>SELECT ro.id, collect_set(DISTINCT o.name) as organizations,
                         collect_set(DISTINCT o.country) as countries
                         FROM ro
                         LEFT OUTER JOIN o ON ro.organization = o.id
@@ -169,8 +169,8 @@
 					</cacheable  >
                 </entity>
                 <entity id="result_rlout" name="result_rlout" alias="rlout" tAlias ="tmp_rlout" type="view" >
-                    <content>SELECT cout.id, count(ri.result as outid) as citations,
-                        collect_set(DISTINCT d.name as outdatasrc) as citvenues
+                    <content>SELECT cout.id, count(ri.result) as citations,
+                        collect_set(DISTINCT d.name) as citvenues
                         FROM cout
                         LEFT OUTER JOIN ri ON cout.id = ri.id
                         LEFT OUTER JOIN d ON d.id = ri.hostedby
@@ -184,8 +184,8 @@
                     </cacheable  >
                 </entity>
                 <entity id="result_rlin" name="result_rlin" alias="rlin" tAlias ="tmp_rlin" type="view" >
-                    <content>SELECT cout.target as id, count(cout.id as cintid) as references,
-                        collect_set(DISTINCT d.name as indatasrc) as refvenues
+                    <content>SELECT cout.target as id, count(cout.id) as references,
+                        collect_set(DISTINCT d.name) as refvenues
                         FROM cout
                         LEFT OUTER JOIN ri ON cout.id = ri.result
                         LEFT OUTER JOIN d ON d.id = ri.hostedby
