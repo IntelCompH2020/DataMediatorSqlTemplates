@@ -83,7 +83,7 @@
                     <location>project</location>
                 </entity>
                 <entity id="result_instance" name="result_instance" alias="ri" tAlias="tmp_ri" format="parquet">
-                    <content>SELECT result,hostedby FROM tmp_ri</content>
+                    <content>SELECT id,result,hostedby FROM tmp_ri</content>
                     <location>result_instance</location>
                 </entity>
                 <entity id="datasource" name="datasource" alias="d" tAlias="tmp_d" format="parquet">
