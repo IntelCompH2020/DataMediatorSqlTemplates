@@ -77,7 +77,10 @@
 				<content>SELECT * FROM tmp_rp</content>
                     <location>result_project</location>
 			
-                </entity>			
+                </entity>
+                <entity id="project_organizations" name="project_organizations" alias="po" tAlias ="tmp_PO" format="parquet" conditionals="">
+                    <location>project_organizations</location>
+                </entity>
                 <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
 				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
                     <location>project</location>
@@ -173,7 +176,7 @@
                         collect_set(DISTINCT d.name) as citvenues
                         FROM cout
                         LEFT OUTER JOIN ri ON cout.id = ri.id
-                        LEFT OUTER JOIN d ON d.id = ri.hostedby
+                        LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
                         GROUP BY cout.id</content>
                     <cacheable  type="persistent"
                                 id="oagdc3"
@@ -188,7 +191,7 @@
                         collect_set(DISTINCT d.name) as refvenues
                         FROM cout
                         LEFT OUTER JOIN ri ON cout.id = ri.result
-                        LEFT OUTER JOIN d ON d.id = ri.hostedby
+                        LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
                         GROUP BY cout.target</content>
                     <cacheable  type="persistent"
                                 id="oagdc3"
@@ -220,7 +223,7 @@
 					    LEFT OUTER JOIN rlpid ON r.id = rlpid.id
 					    LEFT OUTER JOIN rld ON r.id = rld.id
 					    LEFT OUTER JOIN rlr ON r.id = rlr.id
-                        LEFT OUTER JOIN rlds ON r.id = rlds.id
+                        JOIN rlds ON r.id = rlds.id
                         LEFT OUTER JOIN rlo ON r.id = rlo.id
                         LEFT OUTER JOIN rlout ON r.id = rlout.id
                         LEFT OUTER JOIN rlin ON r.id = rlin.id
