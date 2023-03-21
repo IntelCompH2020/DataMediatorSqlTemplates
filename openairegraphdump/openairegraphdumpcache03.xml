@@ -68,22 +68,6 @@
                     <content></content>
 					<location>result_description</location>
 			
-                </entity>	
-                <entity id="result_author" name="result_author" alias="ra" tAlias ="tmp_ra" format="parquet" >
-					<content>SELECT id,fullname FROM tmp_ra</content>
-                    <location>result_author</location>
-                </entity>
-                <entity id="result_project" name="result_project" alias="rp" tAlias ="tmp_rp" format="parquet">
-				<content>SELECT * FROM tmp_rp</content>
-                    <location>result_project</location>
-			
-                </entity>
-                <entity id="project_organizations" name="project_organizations" alias="po" tAlias ="tmp_PO" format="parquet" conditionals="">
-                    <location>project_organizations</location>
-                </entity>
-                <entity id="project" name="project" alias="prj" tAlias ="tmp_prj" type="parquet">
-				<content>SELECT id,title,acronym,code FROM tmp_prj</content>
-                    <location>project</location>
                 </entity>
                 <entity id="result_instance" name="result_instance" alias="ri" tAlias="tmp_ri" format="parquet">
                     <content>SELECT id,result,hostedby FROM tmp_ri</content>
