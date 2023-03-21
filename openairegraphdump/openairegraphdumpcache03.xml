@@ -163,7 +163,7 @@
                         LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
                         GROUP BY cout.id</content>
                     <cacheable  type="persistent"
-                                id="oagdc3"
+                                id="oagdc3.1"
                                 args="@{[src]}"
                                 desc="Citations Out Group By"
                                 policy="Standard">
@@ -178,7 +178,7 @@
                         LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
                         GROUP BY cout.target</content>
                     <cacheable  type="persistent"
-                                id="oagdc3"
+                                id="oagdc3.1"
                                 args="@{[src]}"
                                 desc="References in Group By"
                                 policy="Standard">
@@ -213,7 +213,7 @@
                         LEFT OUTER JOIN rlin ON r.id = rlin.id
                     </content>
 					<cacheable  type="persistent"
-                                id="oagdc3"
+                                id="oagdc3.1"
                                 args="@{[src]}"
                                 desc="Final Join"
                                 policy="Standard">
