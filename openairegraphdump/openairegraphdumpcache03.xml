@@ -159,11 +159,11 @@
                     <content>SELECT cout.id, count(ri.result) as citations,
                         collect_set(DISTINCT d.name) as citvenues
                         FROM cout
-                        LEFT OUTER JOIN ri ON cout.id = ri.id
+                        LEFT OUTER JOIN ri ON cout.id = ri.result
                         LEFT OUTER JOIN d ON d.id = ri.hostedby and d.type in ('Journal', 'Journal Aggregator')
                         GROUP BY cout.id</content>
                     <cacheable  type="persistent"
-                                id="oagdc3.1"
+                                id="oagdc3.2"
                                 args="@{[src]}"
                                 desc="Citations Out Group By"
                                 policy="Standard">
