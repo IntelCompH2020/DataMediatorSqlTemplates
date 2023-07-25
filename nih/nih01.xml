@@ -63,7 +63,7 @@
     <datasinks>
         <datasink id="out" name="MyOut" datatype="openairegraph.pubs.01"
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
-                  format="json" conditionals="" sql="PrimarySQL">
+                  format="parquet" conditionals="" sql="PrimarySQL">
             <location>@{[fs]}@{[dest]}</location>
             <defaultlocation></defaultlocation>
             <parameters>

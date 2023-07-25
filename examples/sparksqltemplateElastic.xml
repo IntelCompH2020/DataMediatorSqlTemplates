@@ -132,7 +132,7 @@
         -->
         <datasink id="out" name="MyOut" datatype="MyDataSetType"
                   storetype="com.citesa.spark.sqlcomposer.sink.FileSink"
-                  format="json" sql="PrimarySQL">
+                  format="parquet" sql="PrimarySQL">
             <!-- TODO: check what can be inferred from the catalogue (e.g. location and type of store) -->
             <location>file:/Users/vmarantos/Documents/work/datamediator/data/out/test2</location>
             <defaultlocation></defaultlocation>
